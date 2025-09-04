@@ -1,4 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://xfps6kkvm372"]
+[gd_scene load_steps=6 format=3 uid="uid://xfps6kkvm372"]
+
+[ext_resource type="Script" uid="uid://c82iq2yyn4g6u" path="res://main.gd" id="1_ig7tw"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_7dm0k"]
 size = Vector3(60, 2, 60)
@@ -13,6 +15,7 @@ size = Vector3(10, 10, 10)
 size = Vector3(10, 10, 10)
 
 [node name="Main" type="Node"]
+script = ExtResource("1_ig7tw")
 
 [node name="ground" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
