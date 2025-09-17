@@ -24,11 +24,10 @@ func _move(delta):
 	if(time_since_last_move>=move_interval):
 		position += move_vector*grid_size
 		time_since_last_move = 0
-	
-
+		
 func _stop():
 	isOnGround = true
-
+	
 func _on_area_3d_body_entered(body: Node3D) -> void:
 	hit.emit()
 	print(\"hit!!\")
