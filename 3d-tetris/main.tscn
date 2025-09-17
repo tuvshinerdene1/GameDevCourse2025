@@ -1,11 +1,15 @@
-[gd_scene load_steps=4 format=3 uid="uid://xfps6kkvm372"]
+[gd_scene load_steps=5 format=3 uid="uid://xfps6kkvm372"]
 
 [ext_resource type="Script" uid="uid://c82iq2yyn4g6u" path="res://main.gd" id="1_ig7tw"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_7dm0k"]
 size = Vector3(60, 2, 60)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ig7tw"]
+albedo_color = Color(0.431373, 1, 1, 1)
+
 [sub_resource type="BoxMesh" id="BoxMesh_ig7tw"]
+material = SubResource("StandardMaterial3D_ig7tw")
 size = Vector3(60, 2, 60)
 
 [node name="Main" type="Node"]
@@ -23,11 +27,10 @@ mesh = SubResource("BoxMesh_ig7tw")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.773254, -0.338297, 0.536314, -0.634096, -0.412539, 0.654013, 5.96046e-08, -0.845793, -0.533511, 0, 15.8837, 0)
-light_color = Color(0.690041, 0.634163, 0.346683, 1)
 shadow_enabled = true
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 100, 0)
 
 [node name="spawnPoint" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 40, 5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 45, 5)
