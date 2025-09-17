@@ -2,36 +2,18 @@
 
 [sub_resource type="GDScript" id="GDScript_i8jwd"]
 script/source = "extends Node3D
-@export var speed: float = 1
-var move_vector = Vector3(0,-1,0)
-var grid_size = 5
-var isOnGround = false
-var time_since_last_move: float = 0.0
-var move_interval: float = 0.0
 signal hit
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	move_interval = 1/speed
-
+	pass
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	if not isOnGround:
-		_move(delta)
+	pass
 
-func _move(delta):
-	time_since_last_move += delta
-	if(time_since_last_move>=move_interval):
-		position += move_vector*grid_size
-		time_since_last_move = 0
-		
-func _stop():
-	isOnGround = true
-	
 func _on_area_3d_body_entered(body: Node3D) -> void:
 	hit.emit()
 	print(\"hit!!\")
-	_stop()
 "
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_i8jwd"]
@@ -41,8 +23,8 @@ size = Vector3(10, 10, 10)
 size = Vector3(10, 10, 10)
 
 [node name="Node3D" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 5)
 script = SubResource("GDScript_i8jwd")
-speed = 1.7
 
 [node name="Area3D" type="Area3D" parent="."]
 
