@@ -2,6 +2,13 @@ extends Node
 @export var speed: float = 1
 @export var move_interval_hor:float = 0.2
 @export var boost_multiplier:float = 1.5
+var shapes = [
+	preload("res://blocks/CubeShape.tscn"),
+	preload("res://blocks/IShape.tscn"),
+	preload("res://blocks/LShape.tscn"),
+	preload("res://blocks/TShape.tscn"),
+	preload("res://blocks/ZShape.tscn")
+]
 var block = preload('res://blocks/block.tscn')
 var instance = null
 var spawnPoint
@@ -17,7 +24,8 @@ func _ready() -> void:
 	move_interval = 1/speed
 
 func _spawn_block():
-	instance = block.instantiate()
+	#instance = block.instantiate()
+	instance = shapes[randi()%shapes.size()].instantiate()
 	spawnPoint = get_node("spawnPoint")
 	add_child(instance)
 	instance.global_position = spawnPoint.global_position
