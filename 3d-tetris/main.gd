@@ -8,7 +8,6 @@ var shapes = [
 	preload("res://blocks/LShape.tscn"),
 	preload("res://blocks/TShape.tscn"),
 	preload("res://blocks/ZShape.tscn")
-	
 ]
 
 var grid_management = null
