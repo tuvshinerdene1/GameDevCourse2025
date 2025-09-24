@@ -16,7 +16,6 @@ var move_vector = Vector3(0,-1,0)
 var time_since_last_move: float = 0.0
 var time_since_last_move_hor: float = 0.0
 var move_interval: float = 0.0
-
 var grid = {}
 var grid_width = 20
 var grid_height = 20
@@ -100,6 +99,7 @@ func _move_horizontally(delta):
 			new_pos += Vector3(-1, 0, 0) * grid_size
 			moved = true
 		if moved and grid_management.can_move_to(new_pos):
+		#if grid_management.can_move_to(new_pos):
 			instance.global_position = new_pos
 			time_since_last_move_hor = 0
 		
