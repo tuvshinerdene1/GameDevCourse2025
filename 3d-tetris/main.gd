@@ -16,7 +16,7 @@ var move_vector = Vector3(0,-1,0)
 var time_since_last_move: float = 0.0
 var time_since_last_move_hor: float = 0.0
 var move_interval: float = 0.0
-var grid = {}
+var grid = []
 var grid_width = 20
 var grid_height = 20
 var grid_depth = 20
@@ -61,10 +61,11 @@ func on_block_hit():
 	_stop_block()
 	
 func _stop_block():
-	# Lock the shape in place by adding all its grid positions
-	for grid_pos in grid_management.get_piece_grid_positions(instance):
-		grid[grid_pos] = true
-	print (grid)
+	var grid_positions = grid_management.get_piece_grid_positions(instance)
+	for grid_pos in grid_positions:
+		if not grid.has(grid_pos):  # Prevent duplicates
+			grid.append(grid_pos)
+	print("Grid after stop: ", grid)
 	_spawn_block()
 	grid_management.row_complete_handler()
 
@@ -86,23 +87,23 @@ func _move_horizontally(delta):
 	if time_since_last_move_hor >= move_interval_hor:
 		var moved = false
 		var new_pos = instance.global_position
-		if Input.is_action_just_pressed("move_down"):
+		# Use is_action_pressed for continuous movement
+		if Input.is_action_pressed("move_down"):
 			new_pos += Vector3(0, 0, 1) * grid_size
 			moved = true
-		elif Input.is_action_just_pressed("move_up"):
+		elif Input.is_action_pressed("move_up"):
 			new_pos += Vector3(0, 0, -1) * grid_size
 			moved = true
-		elif Input.is_action_just_pressed("move_right"):
+		elif Input.is_action_pressed("move_right"):
 			new_pos += Vector3(1, 0, 0) * grid_size
 			moved = true
-		elif Input.is_action_just_pressed("move_left"):
+		elif Input.is_action_pressed("move_left"):
 			new_pos += Vector3(-1, 0, 0) * grid_size
 			moved = true
+		
 		if moved and grid_management.can_move_to(new_pos):
-		#if grid_management.can_move_to(new_pos):
 			instance.global_position = new_pos
 			time_since_last_move_hor = 0
-		
 func _clear():
 	if instance != null:
 		instance = null
