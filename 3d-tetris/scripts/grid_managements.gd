@@ -39,14 +39,22 @@ func is_any_grid_position_occupied(grid_positions: Array) -> bool:
 	return false
 
 func can_move_to(new_pos: Vector3) -> bool:
-	var grid_positions = get_piece_grid_positions(instance)
-	var offset = grid_position(new_pos) - grid_position(instance.global_position)
-	for i in range(grid_positions.size()):
-		var new_grid_pos = grid_positions[i] + offset
-		if new_grid_pos.y < 0 or new_grid_pos.y >= grid_height or new_grid_pos.x < 0 or new_grid_pos.x >= grid_width or new_grid_pos.z < 0 or new_grid_pos.z >= grid_depth:
+	var new_piece_positions = get_piece_grid_positions_at_pos(instance, new_pos)
+	for pos in new_piece_positions:
+		if pos.y < 0 or pos.y >= grid_height or pos.x < 0 or pos.x >= grid_width or pos.z < 0 or pos.z >= grid_depth:
 			return false
-		if grid.has(new_grid_pos) and not grid_positions.has(new_grid_pos):
+		if grid.has(pos):
 			return false
 	return true
+	
+func get_piece_grid_positions_at_pos(piece: Node3D, target_pos: Vector3) -> Array:
+	var positions = []
+	var piece_pos = grid_position(target_pos)
+	for child in piece.get_children():
+		if child is Node3D:
+			var local_pos = grid_position(child.global_position - piece.global_position)
+			positions.append(piece_pos + local_pos)
+	return positions
+	
 func row_complete_handler():
 	print("row complete handler")
