@@ -3,14 +3,14 @@
 [ext_resource type="Script" uid="uid://c82iq2yyn4g6u" path="res://main.gd" id="1_ig7tw"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_7dm0k"]
-size = Vector3(60, 2, 60)
+size = Vector3(200, 2, 200)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ig7tw"]
 albedo_color = Color(0.431373, 1, 1, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_ig7tw"]
 material = SubResource("StandardMaterial3D_ig7tw")
-size = Vector3(60, 2, 60)
+size = Vector3(200, 2, 200)
 
 [node name="Main" type="Node"]
 script = ExtResource("1_ig7tw")

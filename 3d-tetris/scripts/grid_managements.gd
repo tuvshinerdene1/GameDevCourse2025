@@ -1,25 +1,27 @@
 class_name GridManager extends Node
 
 var grid = {}
-var grid_width = 10
-var grid_height = 10
-var grid_depth = 10
-var grid_size = 10
+var grid_width
+var grid_height
+var grid_depth
+var grid_size
 var instance = null
 
-func _init(grid_width, grid_height, grid_depth, grid_size, instance):
+func _init(grid_width, grid_height, grid_depth, grid_size, instance, grid):
 	self.grid_width = grid_width
 	self.grid_height = grid_height
 	self.grid_depth = grid_depth
 	self.grid_size = grid_size
 	self.instance = instance
+	self.grid = grid
+
+
+func grid_position(pos: Vector3) -> Vector3i:
+	return Vector3i(round(pos.x / grid_size), round(pos.y / grid_size), round(pos.z / grid_size))
 
 func snap_to_grid(pos: Vector3) -> Vector3:
 	var grid_pos = grid_position(pos)
 	return Vector3(grid_pos.x, grid_pos.y, grid_pos.z) * grid_size
-
-func grid_position(pos: Vector3) -> Vector3i:
-	return Vector3i(round(pos.x / grid_size), round(pos.y / grid_size), round(pos.z / grid_size))
 
 func get_piece_grid_positions(piece: Node3D) -> Array:
 	var positions = []
@@ -46,3 +48,5 @@ func can_move_to(new_pos: Vector3) -> bool:
 		if grid.has(new_grid_pos) and not grid_positions.has(new_grid_pos):
 			return false
 	return true
+func row_complete_handler():
+	print("row complete handler")

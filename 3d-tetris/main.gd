@@ -9,9 +9,7 @@ var shapes = [
 	preload("res://blocks/TShape.tscn"),
 	preload("res://blocks/ZShape.tscn")
 ]
-
 var grid_management = null
-
 var instance = null
 var spawnPoint
 var move_vector = Vector3(0,-1,0)
@@ -20,9 +18,9 @@ var time_since_last_move_hor: float = 0.0
 var move_interval: float = 0.0
 
 var grid = {}
-var grid_width = 10000
-var grid_height = 10000
-var grid_depth = 10000
+var grid_width = 20
+var grid_height = 20
+var grid_depth = 20
 var grid_size = 10
 
 
@@ -36,23 +34,28 @@ func _process(delta: float) -> void:
 	if(instance != null):
 		_move_horizontally(delta)
 		_move(delta)
-
+		
+func _initialize():
+	grid_management = GridManager.new(grid_width, grid_height, grid_depth, grid_size, instance, grid)
+	instance.global_position = spawnPoint.global_position
+	instance.hit.connect(on_block_hit)
+	time_since_last_move = 0.0
+	time_since_last_move_hor = 0.0
+	
+func _game_over_handler():
+	var spawn_positions = grid_management.get_piece_grid_positions(instance)
+	if grid_management.is_any_grid_position_occupied(spawn_positions):
+		print("Game Over: Spawn point blocked!")
+		get_tree().reload_current_scene()  # Simple game over: restart scene
+	
 func _spawn_block():
 	if instance != null:
 		_clear()
 	instance = shapes[randi()%shapes.size()].instantiate()
 	spawnPoint = get_node("spawnPoint")
 	add_child(instance)
-	grid_management = GridManager.new(grid_width, grid_height, grid_depth,grid_size,instance)
-	instance.global_position = spawnPoint.global_position
-	instance.hit.connect(on_block_hit)
-	time_since_last_move = 0.0
-	time_since_last_move_hor = 0.0
-	var spawn_positions = grid_management.get_piece_grid_positions(instance)
-	if grid_management.is_any_grid_position_occupied(spawn_positions):
-		print("Game Over: Spawn point blocked!")
-		get_tree().reload_current_scene()  # Simple game over: restart scene
-
+	_initialize()
+	_game_over_handler()
 	
 func on_block_hit():
 	print("block h as hit something")
@@ -62,7 +65,9 @@ func _stop_block():
 	# Lock the shape in place by adding all its grid positions
 	for grid_pos in grid_management.get_piece_grid_positions(instance):
 		grid[grid_pos] = true
+	print (grid)
 	_spawn_block()
+	grid_management.row_complete_handler()
 
 func _move(delta):
 	time_since_last_move += delta
@@ -101,5 +106,3 @@ func _move_horizontally(delta):
 func _clear():
 	if instance != null:
 		instance = null
-	
-	
