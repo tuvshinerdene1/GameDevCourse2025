@@ -3,21 +3,21 @@
 [ext_resource type="Script" uid="uid://c82iq2yyn4g6u" path="res://main.gd" id="1_ig7tw"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_7dm0k"]
-size = Vector3(200, 2, 200)
+size = Vector3(10, 2, 10)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ig7tw"]
 albedo_color = Color(0.431373, 1, 1, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_ig7tw"]
 material = SubResource("StandardMaterial3D_ig7tw")
-size = Vector3(200, 2, 200)
+size = Vector3(10, 2, 10)
 
 [node name="Main" type="Node"]
 script = ExtResource("1_ig7tw")
 boost_multiplier = 4.0
 
 [node name="ground" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -2, 4)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ground"]
 shape = SubResource("BoxShape3D_7dm0k")
@@ -30,7 +30,7 @@ transform = Transform3D(0.773254, -0.338297, 0.536314, -0.617767, -0.211208, 0.7
 shadow_enabled = true
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.422618, 0.906308, 0, -0.906308, 0.422618, -2.85068, 190, 103.837)
+transform = Transform3D(0.707107, -0.640857, 0.298836, -5.32907e-15, 0.422618, 0.906308, -0.707107, -0.640856, 0.298836, 10, 20, 11)
 
 [node name="spawnPoint" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 45, 5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 15, 5)

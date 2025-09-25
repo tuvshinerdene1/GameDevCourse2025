@@ -8,6 +8,7 @@ var shapes = [
 	preload("res://blocks/LShape.tscn"),
 	preload("res://blocks/TShape.tscn"),
 	preload("res://blocks/ZShape.tscn")
+	#preload("res://blocks/block.tscn")
 ]
 var grid_management = null
 var instance = null
@@ -17,10 +18,11 @@ var time_since_last_move: float = 0.0
 var time_since_last_move_hor: float = 0.0
 var move_interval: float = 0.0
 var grid = []
-var grid_width = 20
-var grid_height = 20
-var grid_depth = 20
-var grid_size = 10
+var grid_width = 10
+var grid_height = 100
+var grid_depth = 10
+var grid_size = 1
+var current_layer = 1;
 
 
 # Called when the node enters the scene tree for the first time.
@@ -45,7 +47,7 @@ func _game_over_handler():
 	var spawn_positions = grid_management.get_piece_grid_positions(instance)
 	if grid_management.is_any_grid_position_occupied(spawn_positions):
 		print("Game Over: Spawn point blocked!")
-		get_tree().reload_current_scene()  # Simple game over: restart scene
+		get_tree().reload_current_scene()  
 	
 func _spawn_block():
 	if instance != null:
@@ -54,20 +56,21 @@ func _spawn_block():
 	spawnPoint = get_node("spawnPoint")
 	add_child(instance)
 	_initialize()
+	grid_management.row_complete_handler(current_layer)
 	_game_over_handler()
 	
 func on_block_hit():
 	print("block h as hit something")
 	_stop_block()
-	
+
 func _stop_block():
 	var grid_positions = grid_management.get_piece_grid_positions(instance)
 	for grid_pos in grid_positions:
-		if not grid.has(grid_pos):  # Prevent duplicates
+		if not grid.has(grid_pos):
 			grid.append(grid_pos)
 	print("Grid after stop: ", grid)
 	_spawn_block()
-	grid_management.row_complete_handler()
+	grid_management.row_complete_handler(current_layer)
 
 func _move(delta):
 	time_since_last_move += delta
@@ -87,7 +90,6 @@ func _move_horizontally(delta):
 	if time_since_last_move_hor >= move_interval_hor:
 		var moved = false
 		var new_pos = instance.global_position
-		# Use is_action_pressed for continuous movement
 		if Input.is_action_pressed("move_down"):
 			new_pos += Vector3(0, 0, 1) * grid_size
 			moved = true
@@ -104,6 +106,7 @@ func _move_horizontally(delta):
 		if moved and grid_management.can_move_to(new_pos):
 			instance.global_position = new_pos
 			time_since_last_move_hor = 0
+			 
 func _clear():
 	if instance != null:
 		instance = null
