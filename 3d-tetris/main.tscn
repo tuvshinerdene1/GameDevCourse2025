@@ -15,7 +15,6 @@ size = Vector3(10, 2, 10)
 [node name="Main" type="Node"]
 script = ExtResource("1_ig7tw")
 speed = 1.6
-move_interval_hor = 0.15
 boost_multiplier = 4.0
 
 [node name="ground" type="StaticBody3D" parent="."]
