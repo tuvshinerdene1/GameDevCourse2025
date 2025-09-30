@@ -16,22 +16,16 @@ func _process(delta: float) -> void:
 	#print(\"hit!!\")
 "
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_i8jwd"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i8jwd"]
+transparency = 1
 
 [sub_resource type="BoxMesh" id="BoxMesh_wp24v"]
+material = SubResource("StandardMaterial3D_i8jwd")
 
 [node name="Node3D" type="Node3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.5, 0.5)
 script = SubResource("GDScript_i8jwd")
 
-[node name="Area3D" type="Area3D" parent="."]
-monitoring = false
-monitorable = false
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
-shape = SubResource("BoxShape3D_i8jwd")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Area3D/CollisionShape3D"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("BoxMesh_wp24v")
-
-[connection signal="body_entered" from="Area3D" to="." method="_on_area_3d_body_entered"]
+skeleton = NodePath("")

@@ -7,6 +7,7 @@ var grid_depth
 var grid_size
 var instance = null
 
+
 func _init(grid_width, grid_height, grid_depth, grid_size, instance, grid):
 	self.grid_width = grid_width
 	self.grid_height = grid_height

@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3 uid="uid://blxfje0indyoj"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ginlu"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_88op6"]
+transparency = 1
+
+[node name="GhostCube" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_ginlu")
+surface_material_override/0 = SubResource("StandardMaterial3D_88op6")

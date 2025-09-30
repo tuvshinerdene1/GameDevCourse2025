@@ -10,8 +10,10 @@ var shapes = [
 	preload("res://blocks/ZShape.tscn")
 	#preload("res://blocks/block.tscn")
 ]
+var shapesIndex = null
 var grid_management = null
 var instance = null
+var ghost_instance= null
 var spawnPoint
 var move_vector = Vector3(0,-1,0)
 var time_since_last_move: float = 0.0
@@ -33,8 +35,9 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	if(instance != null):
-		_move_horizontally(delta)
 		_move(delta)
+		_move_horizontally(delta)
+		_update_ghost_position()
 		
 func _initialize():
 	grid_management = GridManager.new(grid_width, grid_height, grid_depth, grid_size, instance, grid)
@@ -52,9 +55,11 @@ func _game_over_handler():
 func _spawn_block():
 	if instance != null:
 		_clear()
-	instance = shapes[randi()%shapes.size()].instantiate()
+	shapesIndex = randi()%shapes.size()
+	instance = shapes[shapesIndex].instantiate()
 	spawnPoint = get_node("spawnPoint")
 	add_child(instance)
+	_create_ghost()
 	_initialize()
 	grid_management.row_complete_handler(current_layer)
 	_game_over_handler()
@@ -68,7 +73,7 @@ func _stop_block():
 	for grid_pos in grid_positions:
 		if not grid.has(grid_pos):
 			grid.append(grid_pos)
-	print("Grid after stop: ", grid)
+	#print("Grid after stop: ", grid)
 	_spawn_block()
 	grid_management.row_complete_handler(current_layer)
 
@@ -110,3 +115,35 @@ func _move_horizontally(delta):
 func _clear():
 	if instance != null:
 		instance = null
+func _create_ghost():
+	if ghost_instance != null:
+		ghost_instance.queue_free()
+		
+	ghost_instance = shapes[shapesIndex].instantiate()
+	add_child(ghost_instance)
+	
+	# Recursively apply transparent material to all MeshInstance3D nodes
+	_apply_transparent_material(ghost_instance)
+
+func _apply_transparent_material(node: Node) -> void:
+	if node is MeshInstance3D:
+		var mat = node.get_active_material(0)
+		var new_mat
+		if mat and mat is StandardMaterial3D:
+			new_mat = mat.duplicate()
+		else:
+			new_mat = StandardMaterial3D.new()
+		new_mat.albedo_color = Color(1, 1, 1, 0.3)
+		new_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		node.set_surface_override_material(0, new_mat)
+	
+	# Recurse through all children
+	for child in node.get_children():
+		_apply_transparent_material(child)
+func _update_ghost_position():
+	if instance == null or ghost_instance == null:
+		return
+	var ghost_pos = instance.global_position
+	while grid_management.can_move_to(ghost_pos + Vector3(0,-1,0)*grid_size):
+		ghost_pos += Vector3(0,-1,0)*grid_size
+	ghost_instance.global_position = ghost_pos
