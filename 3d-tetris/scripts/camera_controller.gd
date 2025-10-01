@@ -29,7 +29,7 @@ func _update_camera_position():
 		grid_center.z + cos(angle_rad) * camera_distance
 	)
 	
-	camera.look_at(Vector3(grid_center.x, grid_center.y - camera_distance, grid_center.z), Vector3.UP)
+	camera.look_at(Vector3(grid_center.x, grid_center.y - camera_distance*2, grid_center.z), Vector3.UP)
 
 func rotate_left():
 	camera_angle -= 90

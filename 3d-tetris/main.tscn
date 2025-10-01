@@ -14,8 +14,8 @@ size = Vector3(11, 2, 11)
 
 [node name="Main" type="Node"]
 script = ExtResource("1_ig7tw")
-speed = 1.8
-boost_multiplier = 6.0
+speed = 1.2
+boost_multiplier = 5.0
 
 [node name="ground" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -2, 4)

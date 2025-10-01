@@ -20,6 +20,7 @@ var grid_depth = 7
 var grid_size = 1
 
 var spawn_position: Vector3
+var landed_blocks = {}  # Dictionary to map grid positions to Node3D objects
 
 func _ready() -> void:
 	shape_factory = ShapeFactory.new()
@@ -38,11 +39,6 @@ func _process(delta: float) -> void:
 		current_piece.process_movement(delta)
 		ghost_piece.update_position()
 		camera_controller.camera_rotation()
-	
-	#if Input.is_action_just_pressed("camera_rotate_left"):
-		#camera_controller.rotate_left()
-	#elif Input.is_action_just_pressed("camera_rotate_right"):
-		#camera_controller.rotate_right()
 
 func _setup_spawn_point():
 	spawn_position = Vector3(
@@ -60,10 +56,6 @@ func _setup_camera():
 	add_child(camera_controller)
 
 func _spawn_block():
-	## Only remove previous falling piece, not landed ones
-	#if current_piece != null and not current_piece.landed:
-		#current_piece.queue_free()
-	
 	var piece_data = shape_factory.create_random_piece(grid_size)
 	current_piece = piece_data["piece"]
 	
@@ -76,15 +68,13 @@ func _spawn_block():
 	current_piece.global_position = spawn_position
 	current_piece.piece_landed.connect(_on_piece_landed)
 	
-	# Check game over AFTER piece is positioned
 	var spawn_positions = grid_management.get_piece_grid_positions(current_piece)
 	if grid_management.is_any_grid_position_occupied(spawn_positions):
 		print("Game Over: Spawn point blocked!")
 		call_deferred("_reload_scene")
-		return  # Don't create ghost if game over
+		return
 	
 	_create_ghost(piece_data["shape_index"])
-
 
 func _create_ghost(shape_index: int):
 	if ghost_piece != null:
@@ -117,19 +107,72 @@ func _auto_fall(delta: float):
 
 func _on_piece_landed():
 	var grid_positions = grid_management.get_piece_grid_positions(current_piece)
+	# Store the Node3D for each grid position
 	for grid_pos in grid_positions:
 		if grid_pos.y >= 0 and not grid.has(grid_pos):
 			grid.append(grid_pos)
+			# Store a reference to the block's Node3D (we'll clone the child nodes)
+			for child in current_piece.get_children():
+				if child is Node3D:
+					var child_grid_pos = grid_management.grid_position(child.global_position)
+					if child_grid_pos == grid_pos:
+						var block_clone = child.duplicate()
+						add_child(block_clone)
+						landed_blocks[grid_pos] = block_clone
+						block_clone.global_position = Vector3(
+							grid_pos.x * grid_size,
+							grid_pos.y * grid_size,
+							grid_pos.z * grid_size
+						)
+
+	current_piece.queue_free()  # Add this line to remove the original piece
+
+	# Clear completed layers and update blocks
+	var clear_result = grid_management.row_complete_handler()
+	if clear_result["cleared_layers"] > 0:
+		print("Cleared ", clear_result["cleared_layers"], " layers!")
+		
+		# Create a set of positions that will be removed for quick lookup
+		var remove_set = {}
+		for pos in clear_result["blocks_to_remove"]:
+			remove_set[pos] = true
+		
+		# First, collect blocks to shift (only blocks that aren't being removed)
+		var blocks_to_shift = []
+		for shift in clear_result["shifted_positions"]:
+			var old_pos = shift["old_pos"]
+			var new_pos = shift["new_pos"]
+			# Make sure this block exists and isn't in the removal list
+			if landed_blocks.has(old_pos) and not remove_set.has(old_pos):
+				blocks_to_shift.append({"old_pos": old_pos, "new_pos": new_pos, "block": landed_blocks[old_pos]})
+		
+		# Remove blocks in cleared layers
+		for pos in clear_result["blocks_to_remove"]:
+			if landed_blocks.has(pos):
+				var block = landed_blocks[pos]
+				landed_blocks.erase(pos)
+				block.queue_free()
+		
+		# Update the shifted blocks
+		for shift_data in blocks_to_shift:
+			var old_pos = shift_data["old_pos"]
+			var new_pos = shift_data["new_pos"]
+			var block = shift_data["block"]
+			
+			# Remove from old position in dictionary
+			if landed_blocks.has(old_pos):
+				landed_blocks.erase(old_pos)
+			
+			# Add to new position
+			landed_blocks[new_pos] = block
+			block.global_position = Vector3(
+				new_pos.x * grid_size,
+				new_pos.y * grid_size,
+				new_pos.z * grid_size
+			)
 	
-	grid_management.row_complete_handler(1)
+	grid = grid_management.grid  # Update the main grid
 	call_deferred("_spawn_block")
-
-func _game_over_handler():
-	var spawn_positions = grid_management.get_piece_grid_positions(current_piece)
-	if grid_management.is_any_grid_position_occupied(spawn_positions):
-		print("Game Over: Spawn point blocked!")
-		call_deferred("_reload_scene")
-
 func _reload_scene():
 	get_tree().reload_current_scene()
 
@@ -137,7 +180,6 @@ func _create_ground():
 	var ground = MeshInstance3D.new()
 	var plane_mesh = PlaneMesh.new()
 	
-	# The size of the ground will be the grid size + a small, fixed border (e.g., 2 units)
 	var border_size: float = 2.0
 	
 	plane_mesh.size = Vector2(
@@ -145,53 +187,52 @@ func _create_ground():
 		grid_depth * grid_size + border_size
 	)
 	
-	# --- Create Grid Material ---
-	var material = StandardMaterial3D.new()
-	material.albedo_color = Color(0.2, 0.2, 0.2)
-	
-	# Enable UV1 for custom texture scaling
-	material.uv1_scale = Vector3(
-		grid_width + border_size / grid_size, # Scale to cover the width
-		grid_depth + border_size / grid_size, # Scale to cover the depth
-		1.0
-	)
-	
-	# You'll need to create a simple, repeating grid texture (a grid pattern on a transparent background)
-	# For simplicity, we can use a texture built into Godot's visual shader or an external one.
-	# The best method is usually a ShaderMaterial for a perfect procedural grid, 
-	# but for a quick setup, let's use a simple texture with a hint of grid.
-	# A placeholder for your grid texture:
-	# material.albedo_texture = preload("res://path/to/your/grid_texture.png")
-	# material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST # For sharp lines
-	
-	# A quick alternative is to just use a lighter color to differentiate the ground
-	# If you want a proper grid pattern, you should use a **ShaderMaterial**.
+	var material = ShaderMaterial.new()
+	var shader = Shader.new()
+	shader.code = """
+		shader_type spatial;
+		render_mode cull_disabled, unshaded;
+		
+		uniform float grid_width = 7.0;
+		uniform float grid_depth = 7.0;
+		uniform float grid_size = 1.0;
+		uniform float border_size = 2.0;
+		uniform vec3 grid_color = vec3(0.8, 0.8, 0.8);
+		uniform vec3 background_color = vec3(0.2, 0.2, 0.2);
+		uniform float line_thickness = 0.05;
+		
+		void fragment() {
+			vec2 total_size = vec2(grid_width + border_size, grid_depth + border_size);
+			vec2 uv = UV * total_size / grid_size;
+			uv -= vec2(border_size / (2.0 * grid_size));
+			bool in_grid = uv.x >= 0.0 && uv.x <= grid_width && uv.y >= 0.0 && uv.y <= grid_depth;
+			vec3 color = background_color;
+			if (in_grid) {
+				vec2 grid = fract(uv);
+				float line_x = step(grid.x, line_thickness) + step(1.0 - grid.x, line_thickness);
+				float line_z = step(grid.y, line_thickness) + step(1.0 - grid.y, line_thickness);
+				float line = min(line_x + line_z, 1.0);
+				color = mix(grid_color, background_color, 1.0 - line);
+			}
+			ALBEDO = color;
+		}
+	"""
+	material.shader = shader
+	material.set_shader_parameter("grid_width", grid_width)
+	material.set_shader_parameter("grid_depth", grid_depth)
+	material.set_shader_parameter("grid_size", grid_size)
+	material.set_shader_parameter("border_size", border_size)
+	material.set_shader_parameter("grid_color", Vector3(0.8, 0.8, 0.8))
+	material.set_shader_parameter("background_color", Vector3(0.2, 0.2, 0.2))
+	material.set_shader_parameter("line_thickness", 0.05)
 	
 	ground.mesh = plane_mesh
 	ground.set_surface_override_material(0, material)
 	
-	# Position remains the same to center the plane
 	ground.position = Vector3(
 		(grid_width * grid_size - grid_size) / 2.0,
-		-grid_size,
+		-grid_size/2,
 		(grid_depth * grid_size - grid_size) / 2.0
 	)
 	
 	add_child(ground)
-	
-	
-	#var material = StandardMaterial3D.new()
-	#material.albedo_color = Color(0.2, 0.2, 0.2)
-	#ground.mesh = plane_mesh
-	#ground.set_surface_override_material(0, material)
-	#
-	## The position calculation remains the same because the plane mesh is centered
-	## around its position. The existing calculation correctly centers the grid area.
-	#ground.position = Vector3(
-		#(grid_width * grid_size - grid_size) / 2.0,
-		#0,
-		#(grid_depth * grid_size - grid_size) / 2.0
-	#)
-	## --- MODIFICATIONS END HERE ---
-	#
-	#add_child(ground)

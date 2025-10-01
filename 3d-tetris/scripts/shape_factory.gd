@@ -1,7 +1,7 @@
 class_name ShapeFactory extends Node
 
 var shapes = [
-	[Vector3i(0,0,0), Vector3i(1,0,0), Vector3i(0,0,1), Vector3i(1,0,1)],  # Cube
+	[Vector3i(0,0,0), Vector3i(1,0,0), Vector3i(0,0,1), Vector3i(1,0,1)], # Cube
 	[Vector3i(0,0,0), Vector3i(1,0,0), Vector3i(2,0,0), Vector3i(3,0,0)],  # I
 	[Vector3i(0,0,0), Vector3i(1,0,0), Vector3i(2,0,0), Vector3i(0,0,1)],  # L
 	[Vector3i(0,0,0), Vector3i(-1,0,0), Vector3i(1,0,0), Vector3i(0,0,1)], # T
