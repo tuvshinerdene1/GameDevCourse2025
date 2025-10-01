@@ -1,39 +1,12 @@
-[gd_scene load_steps=5 format=3 uid="uid://xfps6kkvm372"]
+[gd_scene load_steps=2 format=3 uid="uid://xfps6kkvm372"]
 
 [ext_resource type="Script" uid="uid://c82iq2yyn4g6u" path="res://main.gd" id="1_ig7tw"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_7dm0k"]
-size = Vector3(10, 2, 10)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ig7tw"]
-albedo_color = Color(0.431373, 1, 1, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_ig7tw"]
-material = SubResource("StandardMaterial3D_ig7tw")
-size = Vector3(11, 2, 11)
-
 [node name="Main" type="Node"]
 script = ExtResource("1_ig7tw")
-speed = 1.65
-move_interval_hor = 0.1
+speed = 1.8
 boost_multiplier = 6.0
-rotate_interval = 0.1
-
-[node name="ground" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -2, 4)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="ground"]
-shape = SubResource("BoxShape3D_7dm0k")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="ground/CollisionShape3D"]
-mesh = SubResource("BoxMesh_ig7tw")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.773254, -0.338297, 0.536314, -0.617767, -0.211208, 0.757466, -0.142975, -0.917031, -0.372306, -0.176361, 320.567, 232.438)
 shadow_enabled = true
-
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.537932, 0.842988, 0, -0.842988, 0.537932, 3.89326, 13.8143, 12.5262)
-
-[node name="spawnPoint" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 7, 5)

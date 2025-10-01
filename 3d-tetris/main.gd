@@ -1,230 +1,192 @@
 extends Node
+
 @export var speed: float = 1
-@export var move_interval_hor:float = 0.2
-@export var boost_multiplier:float = 1.5
-@export var rotate_interval: float = 0.2
+@export var boost_multiplier: float = 1.5
 
+var grid_management: GridManager
+var current_piece: Node3D
+var ghost_piece: Node3D
+var camera_controller: Node
+var shape_factory: ShapeFactory
 
-var shapes = [
-	#cube
-	[Vector3i(0,0,0),Vector3i(1,0,0),Vector3i(0,0,1),Vector3i (1,0,1)],
-	#I shape
-	[Vector3i(0,0,0),Vector3i(1,0,0),Vector3i(2,0,0),Vector3i (3,0,0)],
-	#L shape
-	[Vector3i(0,0,0),Vector3i(1,0,0),Vector3i(2,0,0),Vector3i (0,0,1)],
-	#T shape
-	[Vector3i(0,0,0),Vector3i(-1,0,0),Vector3i(1,0,0),Vector3i (0,0,1)],
-	#Z shape
-	[Vector3i(0,0,0),Vector3i(-1,0,0),Vector3i(1,0,1),Vector3i (0,0,1)]
-]
-var colors = [
-	Color.RED,
-	Color.BLUE,
-	Color.GREEN,
-	Color.YELLOW,
-	Color.PURPLE
-]
-var shapesIndex = null
-var grid_management = null
-var instance = null
-var ghost_instance= null
-var spawnPoint
-var move_vector = Vector3(0,-1,0)
+var move_vector = Vector3(0, -1, 0)
 var time_since_last_move: float = 0.0
-var time_since_last_move_hor: float = 0.0
-var time_since_last_rotate: float =0.0
 var move_interval: float = 0.0
+
 var grid = []
 var grid_width = 10
-var grid_height = 100
+var grid_height = 25
 var grid_depth = 10
 var grid_size = 1
-var current_layer = 1;
 
-# Called when the node enters the scene tree for the first time.
+var spawn_position: Vector3
+
 func _ready() -> void:
-	_spawn_block()
-	move_interval = 1/speed
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	if(instance != null):
-		_move(delta)
-		_move_horizontally(delta)
-		_rotate(delta)
-		_update_ghost_position()
-		
-func _initialize():
-	grid_management = GridManager.new(grid_width, grid_height, grid_depth, grid_size, instance, grid)
-	instance.global_position = spawnPoint.global_position
-	#instance.hit.connect(on_block_hit)
-	time_since_last_move = 0.0
-	time_since_last_move_hor = 0.0
+	shape_factory = ShapeFactory.new()
+	add_child(shape_factory)
 	
-func _game_over_handler():
-	var spawn_positions = grid_management.get_piece_grid_positions(instance)
+	_setup_spawn_point()
+	_setup_camera()
+	_create_ground()
+	_spawn_block()
+	
+	move_interval = 1.0 / speed
+
+func _process(delta: float) -> void:
+	if current_piece != null:
+		_auto_fall(delta)
+		current_piece.process_movement(delta)
+		ghost_piece.update_position()
+	
+	if Input.is_action_just_pressed("camera_rotate_left"):
+		camera_controller.rotate_left()
+	elif Input.is_action_just_pressed("camera_rotate_right"):
+		camera_controller.rotate_right()
+
+func _setup_spawn_point():
+	spawn_position = Vector3(
+		(grid_width * grid_size - grid_size) / 2.0,
+		grid_height * grid_size - grid_size,
+		(grid_depth * grid_size - grid_size) / 2.0
+	)
+
+func _setup_camera():
+	camera_controller = preload("res://scripts/camera_controller.gd").new()
+	camera_controller.grid_width = grid_width
+	camera_controller.grid_height = grid_height
+	camera_controller.grid_depth = grid_depth
+	camera_controller.grid_size = grid_size
+	add_child(camera_controller)
+
+func _spawn_block():
+	## Only remove previous falling piece, not landed ones
+	#if current_piece != null and not current_piece.landed:
+		#current_piece.queue_free()
+	
+	var piece_data = shape_factory.create_random_piece(grid_size)
+	current_piece = piece_data["piece"]
+	
+	var piece_script = preload("res://scripts/piece_controller.gd")
+	current_piece.set_script(piece_script)
+	add_child(current_piece)
+	
+	grid_management = GridManager.new(grid_width, grid_height, grid_depth, grid_size, current_piece, grid)
+	current_piece.setup(grid_management, camera_controller)
+	current_piece.global_position = spawn_position
+	current_piece.piece_landed.connect(_on_piece_landed)
+	
+	# Check game over AFTER piece is positioned
+	var spawn_positions = grid_management.get_piece_grid_positions(current_piece)
 	if grid_management.is_any_grid_position_occupied(spawn_positions):
 		print("Game Over: Spawn point blocked!")
 		call_deferred("_reload_scene")
-		
-func _reload_scene():
-	get_tree().reload_current_scene()
+		return  # Don't create ghost if game over
 	
-func _spawn_block():
-	if instance != null:
-		_clear()
-	shapesIndex = randi()%shapes.size()
-	instance = _create_block_shape(shapes[shapesIndex])
-	spawnPoint = get_node("spawnPoint")
-	add_child(instance)
-	_create_ghost()
-	_initialize()
-	grid_management.row_complete_handler(current_layer)
-	_game_over_handler()
-func _create_block_shape(shape_offsets:Array) -> Node3D:
-	var block = Node3D.new()
-	var mesh = BoxMesh.new()
-	mesh.size = Vector3(grid_size, grid_size, grid_size)
-	var material = StandardMaterial3D.new()
-	#material.albedo_color = Color(0.8,0.8,0.8)
-	material.albedo_color = colors[shapesIndex]
-	for offset in shape_offsets:
-		var cube = MeshInstance3D.new()
-		cube.mesh = mesh
-		cube.set_surface_override_material(0, material.duplicate())
-		cube.position = Vector3(offset.x, offset.y, offset.z)*grid_size
-		block.add_child(cube)
-	return block
-	
-func on_block_hit():
-	print("block h as hit something")
-	_stop_block()
+	_create_ghost(piece_data["shape_index"])
 
-func _stop_block():
-	var grid_positions = grid_management.get_piece_grid_positions(instance)
+
+func _create_ghost(shape_index: int):
+	if ghost_piece != null:
+		ghost_piece.queue_free()
+	
+	var ghost_data = shape_factory.create_piece(shape_index, grid_size)
+	ghost_piece = ghost_data["piece"]
+	
+	var ghost_script = preload("res://scripts/ghost_piece.gd")
+	ghost_piece.set_script(ghost_script)
+	add_child(ghost_piece)
+	
+	ghost_piece.setup(grid_management, current_piece, grid_size)
+	ghost_piece.apply_transparent_material()
+
+func _auto_fall(delta: float):
+	time_since_last_move += delta
+	var current_move_interval = move_interval
+	
+	if Input.is_action_pressed("boost"):
+		current_move_interval /= boost_multiplier
+	
+	if time_since_last_move >= current_move_interval:
+		if current_piece.move_down(grid_size):
+			time_since_last_move = 0
+
+func _on_piece_landed():
+	var grid_positions = grid_management.get_piece_grid_positions(current_piece)
 	for grid_pos in grid_positions:
 		if grid_pos.y >= 0 and not grid.has(grid_pos):
 			grid.append(grid_pos)
-	grid_management.row_complete_handler(current_layer)
-	# Defer spawning to avoid race conditions
+	
+	grid_management.row_complete_handler(1)
 	call_deferred("_spawn_block")
 
-func _move(delta):
-	time_since_last_move += delta
-	var current_move_interval = move_interval
-	if Input.is_action_pressed("boost"):
-		current_move_interval /= boost_multiplier
-	if time_since_last_move >= current_move_interval:
-		var new_pos = instance.global_position + move_vector * grid_size
-		if grid_management.can_move_to(new_pos):
-			instance.global_position = new_pos
-			time_since_last_move = 0
-		else:
-			on_block_hit()
-		
-func _move_horizontally(delta):
-	time_since_last_move_hor += delta
-	if time_since_last_move_hor >= move_interval_hor:
-		var moved = false
-		var new_pos = instance.global_position
-		if Input.is_action_pressed("move_down"):
-			new_pos += Vector3(0, 0, 1) * grid_size
-			moved = true
-		elif Input.is_action_pressed("move_up"):
-			new_pos += Vector3(0, 0, -1) * grid_size
-			moved = true
-		elif Input.is_action_pressed("move_right"):
-			new_pos += Vector3(1, 0, 0) * grid_size
-			moved = true
-		elif Input.is_action_pressed("move_left"):
-			new_pos += Vector3(-1, 0, 0) * grid_size
-			moved = true
-		
-		if moved and grid_management.can_move_to(new_pos):
-			instance.global_position = new_pos
-			time_since_last_move_hor = 0
-func _rotate(delta:float):
-	time_since_last_rotate += delta
-	if time_since_last_rotate >= rotate_interval:
-		var rotated = false
-		var rotation_axis = Vector3.ZERO
-		
-		if Input.is_action_just_pressed("rotate_left"):  # Spin left around vertical axis
-			rotation_axis = Vector3.UP
-			rotated = true
-		elif Input.is_action_just_pressed("rotate_right"):  # Spin right around vertical axis
-			rotation_axis = Vector3.DOWN
-			rotated = true
-		elif Input.is_action_just_pressed("rotate_up") or Input.is_action_just_pressed("rotate_down"):
-			# Get camera's right vector for forward/backward flipping
-			var camera = get_viewport().get_camera_3d()
-			var camera_right = camera.global_transform.basis.x
-			
-			# Project onto horizontal plane and normalize
-			camera_right.y = 0
-			camera_right = camera_right.normalized()
-			
-			if Input.is_action_just_pressed("rotate_up"):  # Flip away from camera
-				rotation_axis = -camera_right
-			else:  # rotate_down - Flip towards camera
-				rotation_axis = camera_right
-			rotated = true
-		
-		if rotated:
-			# Store original rotation for rollback
-			var original_rotation = instance.rotation
-			
-			# Rotate 90 degrees around the axis
-			instance.rotate(rotation_axis, deg_to_rad(90))
-			
-			# Snap to 90-degree increments to avoid drift
-			instance.rotation_degrees.x = round(instance.rotation_degrees.x / 90) * 90
-			instance.rotation_degrees.y = round(instance.rotation_degrees.y / 90) * 90
-			instance.rotation_degrees.z = round(instance.rotation_degrees.z / 90) * 90
-			
-			# Check if rotation is valid
-			if grid_management.can_rotate_to(instance, instance.rotation_degrees):
-				time_since_last_rotate = 0
-				ghost_instance.rotation = instance.rotation
-			else:
-				# Rollback if invalid
-				instance.rotation = original_rotation
-func _clear():
-	if instance != null:
-		#instance.queue_free()
-		instance = null
-func _create_ghost():
-	if ghost_instance != null:
-		ghost_instance.queue_free()
-		ghost_instance = null
-		
-	ghost_instance = _create_block_shape(shapes[shapesIndex])
-	add_child(ghost_instance)
-	ghost_instance.rotation_degrees = instance.rotation_degrees
-	
-	# Recursively apply transparent material to all MeshInstance3D nodes
-	_apply_transparent_material(ghost_instance)
+func _game_over_handler():
+	var spawn_positions = grid_management.get_piece_grid_positions(current_piece)
+	if grid_management.is_any_grid_position_occupied(spawn_positions):
+		print("Game Over: Spawn point blocked!")
+		call_deferred("_reload_scene")
 
-func _apply_transparent_material(node: Node) -> void:
-	if node is MeshInstance3D:
-		var mat = node.get_active_material(0)
-		var new_mat
-		if mat and mat is StandardMaterial3D:
-			new_mat = mat.duplicate()
-		else:
-			new_mat = StandardMaterial3D.new()
-		new_mat.albedo_color = Color(1, 1, 1, 0.3)
-		new_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		node.set_surface_override_material(0, new_mat)
+func _reload_scene():
+	get_tree().reload_current_scene()
+
+func _create_ground():
+	var ground = MeshInstance3D.new()
+	var plane_mesh = PlaneMesh.new()
 	
-	# Recurse through all children
-	for child in node.get_children():
-		_apply_transparent_material(child)
-func _update_ghost_position():
-	if instance == null or ghost_instance == null or not instance.is_inside_tree():
-		return
-	var ghost_pos = instance.global_position
-	ghost_instance.rotation_degrees = instance.rotation_degrees
-	while grid_management.can_move_to(ghost_pos + Vector3(0,-1,0)*grid_size):
-		ghost_pos += Vector3(0,-1,0)*grid_size
-	ghost_instance.global_position = grid_management.snap_to_grid(ghost_pos)
+	# The size of the ground will be the grid size + a small, fixed border (e.g., 2 units)
+	var border_size: float = 2.0
+	
+	plane_mesh.size = Vector2(
+		grid_width * grid_size + border_size,
+		grid_depth * grid_size + border_size
+	)
+	
+	# --- Create Grid Material ---
+	var material = StandardMaterial3D.new()
+	material.albedo_color = Color(0.2, 0.2, 0.2)
+	
+	# Enable UV1 for custom texture scaling
+	material.uv1_scale = Vector3(
+		grid_width + border_size / grid_size, # Scale to cover the width
+		grid_depth + border_size / grid_size, # Scale to cover the depth
+		1.0
+	)
+	
+	# You'll need to create a simple, repeating grid texture (a grid pattern on a transparent background)
+	# For simplicity, we can use a texture built into Godot's visual shader or an external one.
+	# The best method is usually a ShaderMaterial for a perfect procedural grid, 
+	# but for a quick setup, let's use a simple texture with a hint of grid.
+	# A placeholder for your grid texture:
+	# material.albedo_texture = preload("res://path/to/your/grid_texture.png")
+	# material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST # For sharp lines
+	
+	# A quick alternative is to just use a lighter color to differentiate the ground
+	# If you want a proper grid pattern, you should use a **ShaderMaterial**.
+	
+	ground.mesh = plane_mesh
+	ground.set_surface_override_material(0, material)
+	
+	# Position remains the same to center the plane
+	ground.position = Vector3(
+		(grid_width * grid_size - grid_size) / 2.0,
+		0,
+		(grid_depth * grid_size - grid_size) / 2.0
+	)
+	
+	add_child(ground)
+	
+	
+	#var material = StandardMaterial3D.new()
+	#material.albedo_color = Color(0.2, 0.2, 0.2)
+	#ground.mesh = plane_mesh
+	#ground.set_surface_override_material(0, material)
+	#
+	## The position calculation remains the same because the plane mesh is centered
+	## around its position. The existing calculation correctly centers the grid area.
+	#ground.position = Vector3(
+		#(grid_width * grid_size - grid_size) / 2.0,
+		#0,
+		#(grid_depth * grid_size - grid_size) / 2.0
+	#)
+	## --- MODIFICATIONS END HERE ---
+	#
+	#add_child(ground)
