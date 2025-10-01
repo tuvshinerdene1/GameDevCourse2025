@@ -30,6 +30,7 @@ func _ready() -> void:
 	_setup_camera()
 	_create_ground()
 	_spawn_block()
+	_create_deadzone_layer()
 	
 	move_interval = 1.0 / speed
 
@@ -237,3 +238,38 @@ func _create_ground():
 	)
 	
 	add_child(ground)
+	
+func _create_deadzone_layer():
+	var deadzone_height = grid_height - 1  # Top layer
+	var deadzone_y = deadzone_height * grid_size
+	
+	# Create a container for the deadzone cubes
+	var deadzone_container = Node3D.new()
+	deadzone_container.name = "DeadzoneLayer"
+	add_child(deadzone_container)
+	
+	# Create semi-transparent material
+	var deadzone_material = StandardMaterial3D.new()
+	deadzone_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	deadzone_material.albedo_color = Color(1.0, 0.2, 0.2, 0.02)  # Red with 25% opacity
+	deadzone_material.emission_enabled = true
+	deadzone_material.emission = Color(1.0, 0.1, 0.1)
+	deadzone_material.emission_energy_multiplier = 0.3
+	
+	# Create cubes for each grid position in the deadzone
+	for x in range(grid_width):
+		for z in range(grid_depth):
+			var cube = MeshInstance3D.new()
+			var box_mesh = BoxMesh.new()
+			box_mesh.size = Vector3(grid_size * 0.95, grid_size * 0.95, grid_size * 0.95)
+			
+			cube.mesh = box_mesh
+			cube.material_override = deadzone_material
+			
+			cube.position = Vector3(
+				x * grid_size,
+				deadzone_y,
+				z * grid_size
+			)
+			
+			deadzone_container.add_child(cube)
