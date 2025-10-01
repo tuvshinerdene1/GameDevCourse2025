@@ -27,14 +27,28 @@ func snap_to_grid(pos: Vector3) -> Vector3:
 		round(pos.y / grid_size) * grid_size,
 		round(pos.z / grid_size) * grid_size
 	)
-
-func get_piece_grid_positions(piece: Node3D) -> Array:
-	var positions = []
-	var piece_pos = grid_position(piece.global_position)
+func get_piece_local_grid_offsets(piece: Node3D) -> Array:
+	var local_offsets = []
 	for child in piece.get_children():
 		if child is Node3D:
-			var local_pos = grid_position(child.global_position - piece.global_position)
-			positions.append(piece_pos + local_pos)
+			# Directly convert the child's local position/offset to an integer grid offset
+			var local_pos = child.position
+			var offset_grid_units = Vector3i(
+				round(local_pos.x / grid_size),
+				round(local_pos.y / grid_size),
+				round(local_pos.z / grid_size)
+			)
+			local_offsets.append(offset_grid_units)
+	return local_offsets
+	
+func get_piece_grid_positions(piece: Node3D) -> Array:
+	var positions = []
+	var piece_grid_pos = grid_position(piece.global_position) # Parent's grid index
+	# Iterating over children is safer here because rotation affects child world positions
+	for child in piece.get_children():
+		if child is Node3D:
+			# The child's global position is used to get its current grid index.
+			positions.append(grid_position(child.global_position))
 	return positions
 
 func is_any_grid_position_occupied(grid_positions: Array) -> bool:
@@ -54,6 +68,22 @@ func can_move_to(new_pos: Vector3) -> bool:
 			#print("Collision at: ", pos)
 			return false
 	return true
+
+func can_rotate_to(node: Node, rotation: Vector3) -> bool:
+	var original_rotation = node.rotation_degrees
+	var original_position = node.global_position
+	node.rotation_degrees = rotation  # Temporarily apply rotation
+	node.global_position = snap_to_grid(node.global_position)
+	var grid_positions = get_piece_grid_positions(node)
+	node.rotation_degrees = original_rotation  # Revert rotation
+	node.global_position = original_position
+	# Check if all grid positions are valid
+	for pos in grid_positions:
+		if pos.x < 0 or pos.x >= grid_width or pos.z < 0 or pos.z >= grid_depth or pos.y < 0:
+			return false  # Out of bounds
+		if grid.has(pos):
+			return false  # Collides with existing block
+	return true
 	
 func get_piece_local_positions(piece: Node3D) -> Array:
 	var local_positions = []
@@ -66,10 +96,22 @@ func get_piece_local_positions(piece: Node3D) -> Array:
 
 func get_piece_grid_positions_at_pos(piece: Node3D, target_pos: Vector3) -> Array:
 	var positions = []
-	var new_parent_grid_pos = grid_position(target_pos)
-	var local_positions = get_piece_local_positions(piece)
-	for local_pos in local_positions:
-		positions.append(new_parent_grid_pos + local_pos)
+	var new_parent_grid_pos = grid_position(target_pos) # Target grid index
+	
+	# Use the original piece to calculate the new positions
+	var original_position = piece.global_position
+	
+	# Temporarily move the piece to the target position
+	piece.global_position = target_pos
+	
+	# Get the grid positions at the new world position
+	for child in piece.get_children():
+		if child is Node3D:
+			positions.append(grid_position(child.global_position))
+			
+	# Restore the piece's original position
+	piece.global_position = original_position
+	
 	return positions
 
 func row_complete_handler(layer_number):

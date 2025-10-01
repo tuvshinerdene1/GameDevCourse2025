@@ -6,13 +6,18 @@
 [node name="CubeShape" type="Node3D"]
 script = ExtResource("1_gudcg")
 
-[node name="cube" parent="." instance=ExtResource("1_steuc")]
+[node name="Node3D" parent="." instance=ExtResource("1_steuc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.5, -0.5)
+metadata/_edit_group_ = true
 
-[node name="cube2" parent="." instance=ExtResource("1_steuc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.5, 1.5)
+[node name="Node3D2" parent="." instance=ExtResource("1_steuc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.5, -0.5)
+metadata/_edit_group_ = true
 
-[node name="cube3" parent="." instance=ExtResource("1_steuc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0.5, 0.5)
+[node name="Node3D3" parent="." instance=ExtResource("1_steuc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.5, 0.5)
+metadata/_edit_group_ = true
 
-[node name="cube4" parent="." instance=ExtResource("1_steuc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0.5, 1.5)
+[node name="Node3D4" parent="." instance=ExtResource("1_steuc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.5, 0.5)
+metadata/_edit_group_ = true

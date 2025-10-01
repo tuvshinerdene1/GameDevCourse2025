@@ -2,6 +2,7 @@ extends Node
 @export var speed: float = 1
 @export var move_interval_hor:float = 0.2
 @export var boost_multiplier:float = 1.5
+@export var rotate_interval: float = 0.2
 var shapes = [
 	preload("res://blocks/CubeShape.tscn"),
 	preload("res://blocks/IShape.tscn"),
@@ -18,6 +19,7 @@ var spawnPoint
 var move_vector = Vector3(0,-1,0)
 var time_since_last_move: float = 0.0
 var time_since_last_move_hor: float = 0.0
+var time_since_last_rotate: float =0.0
 var move_interval: float = 0.0
 var grid = []
 var grid_width = 10
@@ -37,6 +39,7 @@ func _process(delta: float) -> void:
 	if(instance != null):
 		_move(delta)
 		_move_horizontally(delta)
+		_rotate(delta)
 		_update_ghost_position()
 		
 func _initialize():
@@ -71,11 +74,11 @@ func on_block_hit():
 func _stop_block():
 	var grid_positions = grid_management.get_piece_grid_positions(instance)
 	for grid_pos in grid_positions:
-		if not grid.has(grid_pos):
+		if grid_pos.y >= 0 and not grid.has(grid_pos):
 			grid.append(grid_pos)
-	#print("Grid after stop: ", grid)
-	_spawn_block()
 	grid_management.row_complete_handler(current_layer)
+	# Defer spawning to avoid race conditions
+	call_deferred("_spawn_block")
 
 func _move(delta):
 	time_since_last_move += delta
@@ -111,16 +114,37 @@ func _move_horizontally(delta):
 		if moved and grid_management.can_move_to(new_pos):
 			instance.global_position = new_pos
 			time_since_last_move_hor = 0
+func _rotate(delta:float):
+	time_since_last_rotate += delta
+	if time_since_last_rotate >= rotate_interval:
+		var rotated = false
+		var new_rotation = instance.rotation_degrees
+		if Input.is_action_just_pressed("rotate_left"):
+			new_rotation.y += 90
+			rotated = true
+		elif Input.is_action_just_pressed("rotate_right"):
+			new_rotation.y -= 90
+			rotated = true
+		if rotated and grid_management.can_rotate_to(instance, new_rotation):
+			instance.rotation_degrees = new_rotation
+			time_since_last_rotate = 0
+			ghost_instance.rotation_degrees = new_rotation
+			
+		
+	
 			 
 func _clear():
 	if instance != null:
+		#instance.queue_free()
 		instance = null
 func _create_ghost():
 	if ghost_instance != null:
-		ghost_instance.queue_free()
+		#ghost_instance.queue_free()
+		ghost_instance = null
 		
 	ghost_instance = shapes[shapesIndex].instantiate()
 	add_child(ghost_instance)
+	ghost_instance.rotation_degrees = instance.rotation_degrees
 	
 	# Recursively apply transparent material to all MeshInstance3D nodes
 	_apply_transparent_material(ghost_instance)
@@ -141,9 +165,10 @@ func _apply_transparent_material(node: Node) -> void:
 	for child in node.get_children():
 		_apply_transparent_material(child)
 func _update_ghost_position():
-	if instance == null or ghost_instance == null:
+	if instance == null or ghost_instance == null or not instance.is_inside_tree():
 		return
 	var ghost_pos = instance.global_position
+	ghost_instance.rotation_degrees = instance.rotation_degrees
 	while grid_management.can_move_to(ghost_pos + Vector3(0,-1,0)*grid_size):
 		ghost_pos += Vector3(0,-1,0)*grid_size
-	ghost_instance.global_position = ghost_pos
+	ghost_instance.global_position = grid_management.snap_to_grid(ghost_pos)

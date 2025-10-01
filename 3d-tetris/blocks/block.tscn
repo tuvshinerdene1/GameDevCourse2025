@@ -23,7 +23,6 @@ transparency = 1
 material = SubResource("StandardMaterial3D_i8jwd")
 
 [node name="Node3D" type="Node3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.5, 0.5)
 script = SubResource("GDScript_i8jwd")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
