@@ -1,10 +1,23 @@
-[gd_scene load_steps=3 format=3 uid="uid://bhfdbm2mteyh2"]
+[gd_scene load_steps=3 format=3 uid="uid://cco4x6emo8fby"]
 
-[ext_resource type="Script" uid="uid://b0o7ib1b1o82e" path="res://blocks/i_shape.gd" id="1_41l8w"]
-[ext_resource type="PackedScene" uid="uid://bumdey8w74hm" path="res://blocks/block.tscn" id="2_x3d17"]
+[ext_resource type="PackedScene" uid="uid://bqo5vy2qhug35" path="res://blocks/block.tscn" id="2_x3d17"]
+
+[sub_resource type="GDScript" id="GDScript_bofc7"]
+script/source = "extends Node3D
+signal hit
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	for child in get_children():
+		if child.has_signal(\"hit\"):
+			child.hit.connect(_on_child_hit)
+
+func _on_child_hit():
+	hit.emit()
+"
 
 [node name="IShape" type="Node3D"]
-script = ExtResource("1_41l8w")
+script = SubResource("GDScript_bofc7")
 
 [node name="cube" parent="." instance=ExtResource("2_x3d17")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0.5, 0.5)

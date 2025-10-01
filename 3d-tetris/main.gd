@@ -3,13 +3,26 @@ extends Node
 @export var move_interval_hor:float = 0.2
 @export var boost_multiplier:float = 1.5
 @export var rotate_interval: float = 0.2
+
+
 var shapes = [
-	preload("res://blocks/CubeShape.tscn"),
-	preload("res://blocks/IShape.tscn"),
-	preload("res://blocks/LShape.tscn"),
-	preload("res://blocks/TShape.tscn"),
-	preload("res://blocks/ZShape.tscn")
-	#preload("res://blocks/block.tscn")
+	#cube
+	[Vector3i(0,0,0),Vector3i(1,0,0),Vector3i(0,0,1),Vector3i (1,0,1)],
+	#I shape
+	[Vector3i(0,0,0),Vector3i(1,0,0),Vector3i(2,0,0),Vector3i (3,0,0)],
+	#L shape
+	[Vector3i(0,0,0),Vector3i(1,0,0),Vector3i(2,0,0),Vector3i (0,0,1)],
+	#T shape
+	[Vector3i(0,0,0),Vector3i(-1,0,0),Vector3i(1,0,0),Vector3i (0,0,1)],
+	#Z shape
+	[Vector3i(0,0,0),Vector3i(-1,0,0),Vector3i(1,0,1),Vector3i (0,0,1)]
+]
+var colors = [
+	Color.RED,
+	Color.BLUE,
+	Color.GREEN,
+	Color.YELLOW,
+	Color.PURPLE
 ]
 var shapesIndex = null
 var grid_management = null
@@ -28,7 +41,6 @@ var grid_depth = 10
 var grid_size = 1
 var current_layer = 1;
 
-
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	_spawn_block()
@@ -45,7 +57,7 @@ func _process(delta: float) -> void:
 func _initialize():
 	grid_management = GridManager.new(grid_width, grid_height, grid_depth, grid_size, instance, grid)
 	instance.global_position = spawnPoint.global_position
-	instance.hit.connect(on_block_hit)
+	#instance.hit.connect(on_block_hit)
 	time_since_last_move = 0.0
 	time_since_last_move_hor = 0.0
 	
@@ -53,19 +65,36 @@ func _game_over_handler():
 	var spawn_positions = grid_management.get_piece_grid_positions(instance)
 	if grid_management.is_any_grid_position_occupied(spawn_positions):
 		print("Game Over: Spawn point blocked!")
-		get_tree().reload_current_scene()  
+		call_deferred("_reload_scene")
+		
+func _reload_scene():
+	get_tree().reload_current_scene()
 	
 func _spawn_block():
 	if instance != null:
 		_clear()
 	shapesIndex = randi()%shapes.size()
-	instance = shapes[shapesIndex].instantiate()
+	instance = _create_block_shape(shapes[shapesIndex])
 	spawnPoint = get_node("spawnPoint")
 	add_child(instance)
 	_create_ghost()
 	_initialize()
 	grid_management.row_complete_handler(current_layer)
 	_game_over_handler()
+func _create_block_shape(shape_offsets:Array) -> Node3D:
+	var block = Node3D.new()
+	var mesh = BoxMesh.new()
+	mesh.size = Vector3(grid_size, grid_size, grid_size)
+	var material = StandardMaterial3D.new()
+	#material.albedo_color = Color(0.8,0.8,0.8)
+	material.albedo_color = colors[shapesIndex]
+	for offset in shape_offsets:
+		var cube = MeshInstance3D.new()
+		cube.mesh = mesh
+		cube.set_surface_override_material(0, material.duplicate())
+		cube.position = Vector3(offset.x, offset.y, offset.z)*grid_size
+		block.add_child(cube)
+	return block
 	
 func on_block_hit():
 	print("block h as hit something")
@@ -118,31 +147,58 @@ func _rotate(delta:float):
 	time_since_last_rotate += delta
 	if time_since_last_rotate >= rotate_interval:
 		var rotated = false
-		var new_rotation = instance.rotation_degrees
-		if Input.is_action_just_pressed("rotate_left"):
-			new_rotation.y += 90
-			rotated = true
-		elif Input.is_action_just_pressed("rotate_right"):
-			new_rotation.y -= 90
-			rotated = true
-		if rotated and grid_management.can_rotate_to(instance, new_rotation):
-			instance.rotation_degrees = new_rotation
-			time_since_last_rotate = 0
-			ghost_instance.rotation_degrees = new_rotation
-			
+		var rotation_axis = Vector3.ZERO
 		
-	
-			 
+		if Input.is_action_just_pressed("rotate_left"):  # Spin left around vertical axis
+			rotation_axis = Vector3.UP
+			rotated = true
+		elif Input.is_action_just_pressed("rotate_right"):  # Spin right around vertical axis
+			rotation_axis = Vector3.DOWN
+			rotated = true
+		elif Input.is_action_just_pressed("rotate_up") or Input.is_action_just_pressed("rotate_down"):
+			# Get camera's right vector for forward/backward flipping
+			var camera = get_viewport().get_camera_3d()
+			var camera_right = camera.global_transform.basis.x
+			
+			# Project onto horizontal plane and normalize
+			camera_right.y = 0
+			camera_right = camera_right.normalized()
+			
+			if Input.is_action_just_pressed("rotate_up"):  # Flip away from camera
+				rotation_axis = -camera_right
+			else:  # rotate_down - Flip towards camera
+				rotation_axis = camera_right
+			rotated = true
+		
+		if rotated:
+			# Store original rotation for rollback
+			var original_rotation = instance.rotation
+			
+			# Rotate 90 degrees around the axis
+			instance.rotate(rotation_axis, deg_to_rad(90))
+			
+			# Snap to 90-degree increments to avoid drift
+			instance.rotation_degrees.x = round(instance.rotation_degrees.x / 90) * 90
+			instance.rotation_degrees.y = round(instance.rotation_degrees.y / 90) * 90
+			instance.rotation_degrees.z = round(instance.rotation_degrees.z / 90) * 90
+			
+			# Check if rotation is valid
+			if grid_management.can_rotate_to(instance, instance.rotation_degrees):
+				time_since_last_rotate = 0
+				ghost_instance.rotation = instance.rotation
+			else:
+				# Rollback if invalid
+				instance.rotation = original_rotation
 func _clear():
 	if instance != null:
 		#instance.queue_free()
 		instance = null
 func _create_ghost():
 	if ghost_instance != null:
-		#ghost_instance.queue_free()
+		ghost_instance.queue_free()
 		ghost_instance = null
 		
-	ghost_instance = shapes[shapesIndex].instantiate()
+	ghost_instance = _create_block_shape(shapes[shapesIndex])
 	add_child(ghost_instance)
 	ghost_instance.rotation_degrees = instance.rotation_degrees
 	
