@@ -96,7 +96,8 @@ func _auto_fall(delta: float):
 	
 	if Input.is_action_just_pressed("boost_left") and Input.is_action_pressed(("boost_right")):
 		current_piece.global_position = ghost_piece.global_position
-		
+		current_piece.move_down(grid_size)
+		time_since_last_move = 0.0
 	elif Input.is_action_pressed("boost_left") or Input.is_action_pressed(("boost_right")):
 		current_move_interval /= boost_multiplier
 		
