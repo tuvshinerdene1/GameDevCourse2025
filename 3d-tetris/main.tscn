@@ -1,12 +1,44 @@
-[gd_scene load_steps=2 format=3 uid="uid://xfps6kkvm372"]
+[gd_scene load_steps=5 format=3 uid="uid://xfps6kkvm372"]
 
 [ext_resource type="Script" uid="uid://c82iq2yyn4g6u" path="res://main.gd" id="1_ig7tw"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7dm0k"]
+size = Vector3(10, 2, 10)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ig7tw"]
+albedo_color = Color(0.431373, 1, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ig7tw"]
+material = SubResource("StandardMaterial3D_ig7tw")
+size = Vector3(11, 2, 11)
 
 [node name="Main" type="Node"]
 script = ExtResource("1_ig7tw")
 speed = 1.8
 boost_multiplier = 6.0
 
+[node name="ground" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -2, 4)
+visible = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ground"]
+shape = SubResource("BoxShape3D_7dm0k")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ground/CollisionShape3D"]
+mesh = SubResource("BoxMesh_ig7tw")
+
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.773254, -0.338297, 0.536314, -0.617767, -0.211208, 0.757466, -0.142975, -0.917031, -0.372306, -0.176361, 320.567, 232.438)
+transform = Transform3D(0.583446, -0.286702, -0.759864, 0.665497, -0.367511, 0.649653, -0.465515, -0.884724, -0.0236234, -5.58338, 10, 5)
+shadow_enabled = true
+
+[node name="DirectionalLight3D2" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.705468, 0.588795, 0.394507, -0.449, -0.0593923, 0.891556, 0.548374, -0.806098, 0.22247, 14.1198, 10, 5)
+shadow_enabled = true
+
+[node name="DirectionalLight3D3" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.264863, -0.962858, -0.0524639, -0.720522, -0.233773, 0.652839, -0.640855, -0.135111, -0.755678, 1.34328, 10, -7.70737)
+shadow_enabled = true
+
+[node name="DirectionalLight3D4" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.274442, 0.960596, 0.0440208, -0.720305, -0.235688, 0.65239, 0.637058, 0.147334, 0.756604, 5.96658, 10, 16.1959)
 shadow_enabled = true

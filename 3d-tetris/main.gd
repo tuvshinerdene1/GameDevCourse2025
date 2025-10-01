@@ -14,9 +14,9 @@ var time_since_last_move: float = 0.0
 var move_interval: float = 0.0
 
 var grid = []
-var grid_width = 10
-var grid_height = 25
-var grid_depth = 10
+var grid_width = 7
+var grid_height = 15
+var grid_depth = 7
 var grid_size = 1
 
 var spawn_position: Vector3
@@ -37,11 +37,12 @@ func _process(delta: float) -> void:
 		_auto_fall(delta)
 		current_piece.process_movement(delta)
 		ghost_piece.update_position()
+		camera_controller.camera_rotation()
 	
-	if Input.is_action_just_pressed("camera_rotate_left"):
-		camera_controller.rotate_left()
-	elif Input.is_action_just_pressed("camera_rotate_right"):
-		camera_controller.rotate_right()
+	#if Input.is_action_just_pressed("camera_rotate_left"):
+		#camera_controller.rotate_left()
+	#elif Input.is_action_just_pressed("camera_rotate_right"):
+		#camera_controller.rotate_right()
 
 func _setup_spawn_point():
 	spawn_position = Vector3(
@@ -103,9 +104,13 @@ func _auto_fall(delta: float):
 	time_since_last_move += delta
 	var current_move_interval = move_interval
 	
-	if Input.is_action_pressed("boost"):
+	if Input.is_action_just_pressed("boost_left") and Input.is_action_pressed(("boost_right")):
+		current_piece.global_position = ghost_piece.global_position
+		
+	elif Input.is_action_pressed("boost_left") or Input.is_action_pressed(("boost_right")):
 		current_move_interval /= boost_multiplier
-	
+		
+
 	if time_since_last_move >= current_move_interval:
 		if current_piece.move_down(grid_size):
 			time_since_last_move = 0
@@ -168,7 +173,7 @@ func _create_ground():
 	# Position remains the same to center the plane
 	ground.position = Vector3(
 		(grid_width * grid_size - grid_size) / 2.0,
-		0,
+		-grid_size,
 		(grid_depth * grid_size - grid_size) / 2.0
 	)
 	

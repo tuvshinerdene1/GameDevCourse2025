@@ -52,22 +52,26 @@ func _rotate(delta: float):
 		var rotated = false
 		var rotation_axis = Vector3.ZERO
 		
-		if Input.is_action_just_pressed("rotate_left"):
-			rotation_axis = Vector3.UP
+		var camera = get_viewport().get_camera_3d()
+		var camera_forward = -camera.global_transform.basis.z
+		var camera_right = camera.global_transform.basis.x
+		
+		camera_forward.y = 0
+		camera_forward = camera_forward.normalized()
+		camera_right.y = 0
+		camera_right = camera_right.normalized()
+		
+		if Input.is_action_just_pressed("rotate_up"):  # Flip away from camera
+			rotation_axis = -camera_right
 			rotated = true
-		elif Input.is_action_just_pressed("rotate_right"):
-			rotation_axis = Vector3.DOWN
+		elif Input.is_action_just_pressed("rotate_down"):  # Flip towards camera
+			rotation_axis = camera_right
 			rotated = true
-		elif Input.is_action_just_pressed("rotate_up") or Input.is_action_just_pressed("rotate_down"):
-			var camera = get_viewport().get_camera_3d()
-			var camera_right = camera.global_transform.basis.x
-			camera_right.y = 0
-			camera_right = camera_right.normalized()
-			
-			if Input.is_action_just_pressed("rotate_up"):
-				rotation_axis = -camera_right
-			else:
-				rotation_axis = camera_right
+		elif Input.is_action_just_pressed("rotate_left"):  # Flip left (screen-relative)
+			rotation_axis = -camera_forward
+			rotated = true
+		elif Input.is_action_just_pressed("rotate_right"):  # Flip right (screen-relative)
+			rotation_axis = camera_forward
 			rotated = true
 		
 		if rotated:

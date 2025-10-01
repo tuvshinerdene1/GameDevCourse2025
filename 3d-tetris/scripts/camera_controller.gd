@@ -42,6 +42,12 @@ func rotate_right():
 	if camera_angle >= 360:
 		camera_angle = 0
 	_update_camera_position()
+	
+func camera_rotation():
+		if Input.is_action_just_pressed("camera_rotate_left"):
+			rotate_left()
+		elif Input.is_action_just_pressed("camera_rotate_right"):
+			rotate_right()
 
 func get_camera_angle() -> int:
 	return camera_angle
