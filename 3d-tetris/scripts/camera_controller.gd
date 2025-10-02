@@ -22,19 +22,24 @@ func _ready():
 func update_camera_position():
 	var grid_center = Vector3(
 		(grid_width * grid_size - grid_size) / 2.0,
-		(grid_height * grid_size) * 1.1,
+		(grid_height * grid_size)*1.1,
 		(grid_depth * grid_size - grid_size) / 1.5
 	)
 	
 	if is_top_down:
-		# Top-down view
+		# Top-down view - preserve camera angle
 		var top_down_height = grid_height * grid_size * 0.9
+		var angle_rad = deg_to_rad(camera_angle)
+		
 		camera.global_position = Vector3(
 			grid_center.x,
 			top_down_height,
 			grid_center.z
 		)
-		camera.look_at(Vector3(grid_center.x, 0, grid_center.z), Vector3(0, 0, -1))
+		
+		# Look at center but rotate around Y axis based on camera_angle
+		var up_vector = Vector3(-sin(angle_rad), 0, -cos(angle_rad))
+		camera.look_at(Vector3(grid_center.x, 0, grid_center.z), up_vector)
 	else:
 		# Normal orbital view
 		var camera_distance = max(grid_width, grid_depth) * 1.0
@@ -61,13 +66,13 @@ func smooth_rotate_to_angle(new_angle: float):
 	tween.tween_property(self, "camera_angle", target_angle, rotation_duration)
 	tween.tween_callback(func(): is_rotating = false)
 
-func _process(_delta):
+func _process(delta):
 	if is_rotating:
 		update_camera_position()
 
 func rotate_left():
-	if is_rotating:
-		return  # Prevent multiple rotations at once
+	if is_rotating or is_top_down:
+		return  # Prevent rotation in top-down view
 	
 	var new_angle = camera_angle - 90
 	if new_angle < 0:
@@ -75,8 +80,8 @@ func rotate_left():
 	smooth_rotate_to_angle(new_angle)
 
 func rotate_right():
-	if is_rotating:
-		return  # Prevent multiple rotations at once
+	if is_rotating or is_top_down:
+		return  # Prevent rotation in top-down view
 	
 	var new_angle = camera_angle + 90
 	if new_angle >= 360:

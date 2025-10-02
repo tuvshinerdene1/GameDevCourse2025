@@ -24,16 +24,22 @@ func _move_horizontally(delta):
 		var moved = false
 		var new_pos = global_position
 		
-		var camera_angle = camera_controller.get_camera_angle()
-		var angle_rad = deg_to_rad(camera_angle)
-		var camera_forward = Vector3(-sin(angle_rad), 0, -cos(angle_rad))
-		var camera_right = Vector3(cos(angle_rad), 0, -sin(angle_rad))
+		# Get actual camera direction vectors
+		var camera = get_viewport().get_camera_3d()
+		var camera_forward = -camera.global_transform.basis.z
+		var camera_right = camera.global_transform.basis.x
+		
+		# Flatten to horizontal plane
+		camera_forward.y = 0
+		camera_forward = camera_forward.normalized()
+		camera_right.y = 0
+		camera_right = camera_right.normalized()
 		
 		if Input.is_action_pressed("move_down"):
-			new_pos -= camera_forward * grid_management.grid_size
+			new_pos += camera_forward * grid_management.grid_size
 			moved = true
 		elif Input.is_action_pressed("move_up"):
-			new_pos += camera_forward * grid_management.grid_size
+			new_pos -= camera_forward * grid_management.grid_size
 			moved = true
 		elif Input.is_action_pressed("move_right"):
 			new_pos += camera_right * grid_management.grid_size

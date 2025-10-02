@@ -243,7 +243,7 @@ func _create_deadzone_layer():
 	var deadzone_height = grid_height - 1  # Top layer
 	var deadzone_y = deadzone_height * grid_size
 	
-	# Create a container for the deadzone cubes
+	# Create a container for the deadzone
 	var deadzone_container = Node3D.new()
 	deadzone_container.name = "DeadzoneLayer"
 	add_child(deadzone_container)
@@ -256,20 +256,19 @@ func _create_deadzone_layer():
 	deadzone_material.emission = Color(1.0, 0.1, 0.1)
 	deadzone_material.emission_energy_multiplier = 0.3
 	
-	# Create cubes for each grid position in the deadzone
-	for x in range(grid_width):
-		for z in range(grid_depth):
-			var cube = MeshInstance3D.new()
-			var box_mesh = BoxMesh.new()
-			box_mesh.size = Vector3(grid_size * 0.95, grid_size * 0.95, grid_size * 0.95)
-			
-			cube.mesh = box_mesh
-			cube.material_override = deadzone_material
-			
-			cube.position = Vector3(
-				x * grid_size,
-				deadzone_y,
-				z * grid_size
-			)
-			
-			deadzone_container.add_child(cube)
+	# Create a single flat plane for the deadzone
+	var plane = MeshInstance3D.new()
+	var plane_mesh = PlaneMesh.new()
+	plane_mesh.size = Vector2(grid_width * grid_size, grid_depth * grid_size)
+	
+	plane.mesh = plane_mesh
+	plane.material_override = deadzone_material
+	
+	# Position the plane at the deadzone height, centered on the grid
+	plane.position = Vector3(
+		(grid_width * grid_size) / 2.0,
+		deadzone_y,
+		(grid_depth * grid_size) / 2.0
+	)
+	
+	deadzone_container.add_child(plane)
