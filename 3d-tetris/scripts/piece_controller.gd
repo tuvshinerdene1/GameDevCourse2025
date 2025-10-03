@@ -35,11 +35,21 @@ func _move_horizontally(delta):
 		camera_right.y = 0
 		camera_right = camera_right.normalized()
 		
+		# Check if we're in top-down view by looking at camera's Y position relative to grid
+		var is_top_down = camera_controller.is_top_down if camera_controller else false
+		
+		# Adjust directions based on view mode
 		if Input.is_action_pressed("move_down"):
-			new_pos += camera_forward * grid_management.grid_size
+			if is_top_down:
+				new_pos += camera_forward * grid_management.grid_size
+			else:
+				new_pos -= camera_forward * grid_management.grid_size
 			moved = true
 		elif Input.is_action_pressed("move_up"):
-			new_pos -= camera_forward * grid_management.grid_size
+			if is_top_down:
+				new_pos -= camera_forward * grid_management.grid_size
+			else:
+				new_pos += camera_forward * grid_management.grid_size
 			moved = true
 		elif Input.is_action_pressed("move_right"):
 			new_pos += camera_right * grid_management.grid_size
@@ -51,7 +61,6 @@ func _move_horizontally(delta):
 		if moved and grid_management.can_move_to(new_pos):
 			global_position = new_pos
 			time_since_last_move_hor = 0
-
 func _rotate(delta: float):
 	time_since_last_rotate += delta
 	if time_since_last_rotate >= rotate_interval:
@@ -67,16 +76,16 @@ func _rotate(delta: float):
 		camera_right.y = 0
 		camera_right = camera_right.normalized()
 		
-		if Input.is_action_just_pressed("rotate_up"):  # Flip away from camera
+		if Input.is_action_just_pressed("rotate_up"):
 			rotation_axis = -camera_right
 			rotated = true
-		elif Input.is_action_just_pressed("rotate_down"):  # Flip towards camera
+		elif Input.is_action_just_pressed("rotate_down"):
 			rotation_axis = camera_right
 			rotated = true
-		elif Input.is_action_just_pressed("rotate_left"):  # Flip left (screen-relative)
+		elif Input.is_action_just_pressed("rotate_left"):
 			rotation_axis = -camera_forward
 			rotated = true
-		elif Input.is_action_just_pressed("rotate_right"):  # Flip right (screen-relative)
+		elif Input.is_action_just_pressed("rotate_right"):
 			rotation_axis = camera_forward
 			rotated = true
 		
