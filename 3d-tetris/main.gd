@@ -9,19 +9,19 @@ var ghost_piece: Node3D
 var camera_controller: Node
 var shape_factory: ShapeFactory
 
-
 var move_vector = Vector3(0, -1, 0)
 var time_since_last_move: float = 0.0
 var move_interval: float = 0.0
 
 var grid = []
-var grid_width = 7
-var grid_height = 20
-var grid_depth = 7
+var grid_width = 5
+var grid_height = 13
+var grid_depth = 5
 var grid_size = 1
 
 var spawn_position: Vector3
 var landed_blocks = {}  # Dictionary to map grid positions to Node3D objects
+var game_over: bool = false
 
 func _ready() -> void:
 	shape_factory = ShapeFactory.new()
@@ -36,13 +36,14 @@ func _ready() -> void:
 	move_interval = 1.0 / speed
 
 func _process(delta: float) -> void:
+	if game_over:
+		return
 	if current_piece != null:
 		_auto_fall(delta)
 		current_piece.process_movement(delta)
 		if ghost_piece != null:
 			ghost_piece.update_position()
 		camera_controller.camera_rotation()
-
 
 func _setup_spawn_point():
 	spawn_position = Vector3(
@@ -60,6 +61,9 @@ func _setup_camera():
 	add_child(camera_controller)
 
 func _spawn_block():
+	if game_over:
+		return
+	
 	var piece_data = shape_factory.create_random_piece(grid_size)
 	current_piece = piece_data["piece"]
 	
@@ -72,18 +76,16 @@ func _spawn_block():
 	current_piece.global_position = spawn_position
 	current_piece.piece_landed.connect(_on_piece_landed)
 	
-	# IMPROVED GAME OVER CHECK
-	# Check if spawn position is blocked
 	var spawn_positions = grid_management.get_piece_grid_positions(current_piece)
 	for pos in spawn_positions:
-		# Game over if any block spawns in occupied space
 		if grid.has(pos):
 			print("Game Over: Spawn point blocked at position ", pos)
+			game_over = true
 			call_deferred("_game_over")
 			return
-		# Game over if any block spawns at or above the deadzone (grid_height - 1)
 		if pos.y >= grid_height - 1:
 			print("Game Over: Piece spawned in deadzone at height ", pos.y)
+			game_over = true
 			call_deferred("_game_over")
 			return
 	
@@ -113,31 +115,30 @@ func _auto_fall(delta: float):
 		time_since_last_move = 0.0
 	elif Input.is_action_pressed("boost_left") or Input.is_action_pressed(("boost_right")):
 		current_move_interval /= boost_multiplier
-		
-
+	
 	if time_since_last_move >= current_move_interval:
 		if current_piece.move_down(grid_size):
 			time_since_last_move = 0
 
+
 func _on_piece_landed():
 	var grid_positions = grid_management.get_piece_grid_positions(current_piece)
 	
-	# CHECK FOR GAME OVER BEFORE ADDING TO GRID
-	# If any block lands at or above the deadzone line, it's game over
+	# Check for game over before adding to grid
 	for grid_pos in grid_positions:
 		if grid_pos.y >= grid_height - 1:
 			print("Game Over: Block landed in deadzone at height ", grid_pos.y)
 			current_piece.queue_free()
 			if ghost_piece != null:
 				ghost_piece.queue_free()
+			game_over = true
 			call_deferred("_game_over")
 			return
 	
-	# Store the Node3D for each grid position
+	# Store the Node3D for each grid position and create particles
 	for grid_pos in grid_positions:
 		if grid_pos.y >= 0 and not grid.has(grid_pos):
 			grid.append(grid_pos)
-			# Store a reference to the block's Node3D
 			for child in current_piece.get_children():
 				if child is Node3D:
 					var child_grid_pos = grid_management.grid_position(child.global_position)
@@ -158,12 +159,10 @@ func _on_piece_landed():
 	if clear_result["cleared_layers"] > 0:
 		print("Cleared ", clear_result["cleared_layers"], " layers!")
 		
-		# Create a set of positions that will be removed for quick lookup
 		var remove_set = {}
 		for pos in clear_result["blocks_to_remove"]:
 			remove_set[pos] = true
 		
-		# First, collect blocks to shift (only blocks that aren't being removed)
 		var blocks_to_shift = []
 		for shift in clear_result["shifted_positions"]:
 			var old_pos = shift["old_pos"]
@@ -171,22 +170,18 @@ func _on_piece_landed():
 			if landed_blocks.has(old_pos) and not remove_set.has(old_pos):
 				blocks_to_shift.append({"old_pos": old_pos, "new_pos": new_pos, "block": landed_blocks[old_pos]})
 		
-		# Remove blocks in cleared layers
 		for pos in clear_result["blocks_to_remove"]:
 			if landed_blocks.has(pos):
 				var block = landed_blocks[pos]
 				landed_blocks.erase(pos)
 				block.queue_free()
 		
-		# Update the shifted blocks
 		for shift_data in blocks_to_shift:
 			var old_pos = shift_data["old_pos"]
 			var new_pos = shift_data["new_pos"]
 			var block = shift_data["block"]
-			
 			if landed_blocks.has(old_pos):
 				landed_blocks.erase(old_pos)
-			
 			landed_blocks[new_pos] = block
 			block.global_position = Vector3(
 				new_pos.x * grid_size,
@@ -195,22 +190,28 @@ func _on_piece_landed():
 			)
 	
 	grid = grid_management.grid
-	call_deferred("_spawn_block")
+	if not game_over:
+		call_deferred("_spawn_block")
 
 func _game_over():
+	game_over = true
 	print("=== GAME OVER ===")
-	# Optional: Add a delay or game over screen here
+	if current_piece != null:
+		current_piece.queue_free()
+		current_piece = null
+	if ghost_piece != null:
+		ghost_piece.queue_free()
+		ghost_piece = null
 	await get_tree().create_timer(1.0).timeout
 	get_tree().reload_current_scene()
 
 func _reload_scene():
 	_game_over()
+
 func _create_ground():
 	var ground = MeshInstance3D.new()
 	var plane_mesh = PlaneMesh.new()
-	
 	var border_size: float = 2.0
-	
 	plane_mesh.size = Vector2(
 		grid_width * grid_size + border_size,
 		grid_depth * grid_size + border_size
@@ -265,17 +266,15 @@ func _create_ground():
 	)
 	
 	add_child(ground)
-	
+
 func _create_deadzone_layer():
 	var deadzone_height = grid_height - 1  # Top layer
 	var deadzone_y = deadzone_height * grid_size
 	
-	# Create a container for the deadzone
 	var deadzone_container = Node3D.new()
 	deadzone_container.name = "DeadzoneLayer"
 	add_child(deadzone_container)
 	
-	# Create semi-transparent material
 	var deadzone_material = StandardMaterial3D.new()
 	deadzone_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	deadzone_material.albedo_color = Color(1.0, 0.2, 0.2, 0.02)  # Red with 25% opacity
@@ -283,7 +282,6 @@ func _create_deadzone_layer():
 	deadzone_material.emission = Color(1.0, 0.1, 0.1)
 	deadzone_material.emission_energy_multiplier = 0.3
 	
-	# Create a single flat plane for the deadzone
 	var plane = MeshInstance3D.new()
 	var plane_mesh = PlaneMesh.new()
 	plane_mesh.size = Vector2(grid_width * grid_size, grid_depth * grid_size)
@@ -291,11 +289,10 @@ func _create_deadzone_layer():
 	plane.mesh = plane_mesh
 	plane.material_override = deadzone_material
 	
-	# Position the plane at the deadzone height, centered on the grid
 	plane.position = Vector3(
-		(grid_width * grid_size) / 2.0,
+		(grid_width * grid_size) / 1/2,
 		deadzone_y,
-		(grid_depth * grid_size) / 2.0
+		(grid_depth * grid_size) / 1/2
 	)
 	
 	deadzone_container.add_child(plane)

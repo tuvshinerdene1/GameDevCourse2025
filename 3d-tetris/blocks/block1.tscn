@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://bqo5vy2qhug35"]
+
+[ext_resource type="Texture2D" uid="uid://cyppyb5td44wd" path="res://material/Sprite-0003.png" id="1_souav"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xoxf0"]
+albedo_texture = ExtResource("1_souav")
+uv1_offset = Vector3(0.5, 0.5, 0.5)
+uv1_triplanar = true
+texture_filter = 0
+
+[sub_resource type="BoxMesh" id="BoxMesh_nrr8p"]
+material = SubResource("StandardMaterial3D_xoxf0")
+
+[node name="Cube" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_nrr8p")

@@ -6,10 +6,10 @@ var is_rotating = false
 var is_top_down = false
 
 @export var grid_width = 10
-@export var grid_height = 25
+@export var grid_height = 10
 @export var grid_depth = 10
 @export var grid_size = 1
-@export var rotation_duration = 0.5  # Duration in seconds for smooth rotation
+@export var rotation_duration = 0.4  # Duration in seconds for smooth rotation
 
 var camera: Camera3D
 var tween: Tween
@@ -22,37 +22,36 @@ func _ready():
 func update_camera_position():
 	var grid_center = Vector3(
 		(grid_width * grid_size - grid_size) / 2.0,
-		(grid_height * grid_size)*1.1,
-		(grid_depth * grid_size - grid_size) / 1.5
+		(grid_height * grid_size) / 2.0,
+		(grid_depth * grid_size - grid_size) / 2.0
 	)
-	
+
 	if is_top_down:
 		# Top-down view - preserve camera angle
 		var top_down_height = grid_height * grid_size * 0.9
 		var angle_rad = deg_to_rad(camera_angle)
-		
+
 		camera.global_position = Vector3(
 			grid_center.x,
 			top_down_height,
 			grid_center.z
 		)
-		
+
 		# Look at center but rotate around Y axis based on camera_angle
 		var up_vector = Vector3(-sin(angle_rad), 0, -cos(angle_rad))
 		camera.look_at(Vector3(grid_center.x, 0, grid_center.z), up_vector)
 	else:
 		# Normal orbital view
-		var camera_distance = max(grid_width, grid_depth) * 1.0
+		var camera_distance = max(grid_width * grid_size, grid_depth * grid_size) * 1.5
 		var angle_rad = deg_to_rad(camera_angle)
-		
+		var camera_height = grid_center.y + (grid_height * grid_size) * 0.7
 		camera.global_position = Vector3(
 			grid_center.x + sin(angle_rad) * camera_distance,
-			grid_center.y,
+			camera_height,
 			grid_center.z + cos(angle_rad) * camera_distance
 		)
-		
-		camera.look_at(Vector3(grid_center.x, grid_center.y - camera_distance, grid_center.z), Vector3.UP)
 
+		camera.look_at(grid_center, Vector3.UP)
 func smooth_rotate_to_angle(new_angle: float):
 	if is_rotating and tween:
 		tween.kill()  # Stop any existing rotation
@@ -73,19 +72,13 @@ func _process(delta):
 func rotate_left():
 	if is_rotating or is_top_down:
 		return  # Prevent rotation in top-down view
-	
 	var new_angle = camera_angle - 90
-	if new_angle < 0:
-		new_angle = 270
 	smooth_rotate_to_angle(new_angle)
 
 func rotate_right():
 	if is_rotating or is_top_down:
-		return  # Prevent rotation in top-down view
-	
+		return
 	var new_angle = camera_angle + 90
-	if new_angle >= 360:
-		new_angle = 0
 	smooth_rotate_to_angle(new_angle)
 
 func camera_rotation():
