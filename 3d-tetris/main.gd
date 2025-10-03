@@ -16,7 +16,7 @@ var move_interval: float = 0.0
 
 var grid = []
 var grid_width = 7
-var grid_height = 15
+var grid_height = 20
 var grid_depth = 7
 var grid_size = 1
 

@@ -33,7 +33,7 @@ func create_piece(shape_index: int, grid_size: float) -> Dictionary:
 		cube.set_surface_override_material(0, material.duplicate())
 		cube.position = Vector3(offset.x, offset.y, offset.z) * grid_size
 		piece.add_child(cube)
-	
+
 	return {
 		"piece": piece,
 		"shape_index": shape_index

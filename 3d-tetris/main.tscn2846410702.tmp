@@ -29,6 +29,7 @@ mesh = SubResource("BoxMesh_ig7tw")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.583446, -0.286702, -0.759864, 0.665497, -0.367511, 0.649653, -0.465515, -0.884724, -0.0236234, -5.58338, 10, 5)
+visible = false
 shadow_enabled = true
 
 [node name="DirectionalLight3D2" type="DirectionalLight3D" parent="."]
@@ -37,6 +38,7 @@ shadow_enabled = true
 
 [node name="DirectionalLight3D3" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.264863, -0.962858, -0.0524639, -0.720522, -0.233773, 0.652839, -0.640855, -0.135111, -0.755678, 1.34328, 10, -7.70737)
+visible = false
 shadow_enabled = true
 
 [node name="DirectionalLight3D4" type="DirectionalLight3D" parent="."]

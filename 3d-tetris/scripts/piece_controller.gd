@@ -61,6 +61,7 @@ func _move_horizontally(delta):
 		if moved and grid_management.can_move_to(new_pos):
 			global_position = new_pos
 			time_since_last_move_hor = 0
+
 # piece_controller.gd - Updated rotate function with wall kicks
 func _rotate(delta: float):
 	time_since_last_rotate += delta
@@ -130,6 +131,7 @@ func _rotate(delta: float):
 					# Revert both rotation and position
 					rotation = original_rotation
 					global_position = original_position
+
 func move_down(grid_size: float) -> bool:
 	var new_pos = global_position + Vector3(0, -1, 0) * grid_size
 	if grid_management.can_move_to(new_pos):
