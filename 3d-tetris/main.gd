@@ -9,6 +9,7 @@ var ghost_piece: Node3D
 var camera_controller: Node
 var shape_factory: ShapeFactory
 
+
 var move_vector = Vector3(0, -1, 0)
 var time_since_last_move: float = 0.0
 var move_interval: float = 0.0
@@ -38,13 +39,15 @@ func _process(delta: float) -> void:
 	if current_piece != null:
 		_auto_fall(delta)
 		current_piece.process_movement(delta)
-		ghost_piece.update_position()
+		if ghost_piece != null:
+			ghost_piece.update_position()
 		camera_controller.camera_rotation()
+
 
 func _setup_spawn_point():
 	spawn_position = Vector3(
 		(grid_width * grid_size - grid_size) / 2.0,
-		grid_height * grid_size - grid_size,
+		(grid_height-2) * grid_size - grid_size,
 		(grid_depth * grid_size - grid_size) / 2.0
 	)
 
@@ -69,11 +72,20 @@ func _spawn_block():
 	current_piece.global_position = spawn_position
 	current_piece.piece_landed.connect(_on_piece_landed)
 	
+	# IMPROVED GAME OVER CHECK
+	# Check if spawn position is blocked
 	var spawn_positions = grid_management.get_piece_grid_positions(current_piece)
-	if grid_management.is_any_grid_position_occupied(spawn_positions):
-		print("Game Over: Spawn point blocked!")
-		call_deferred("_reload_scene")
-		return
+	for pos in spawn_positions:
+		# Game over if any block spawns in occupied space
+		if grid.has(pos):
+			print("Game Over: Spawn point blocked at position ", pos)
+			call_deferred("_game_over")
+			return
+		# Game over if any block spawns at or above the deadzone (grid_height - 1)
+		if pos.y >= grid_height - 1:
+			print("Game Over: Piece spawned in deadzone at height ", pos.y)
+			call_deferred("_game_over")
+			return
 	
 	_create_ghost(piece_data["shape_index"])
 
@@ -109,11 +121,23 @@ func _auto_fall(delta: float):
 
 func _on_piece_landed():
 	var grid_positions = grid_management.get_piece_grid_positions(current_piece)
+	
+	# CHECK FOR GAME OVER BEFORE ADDING TO GRID
+	# If any block lands at or above the deadzone line, it's game over
+	for grid_pos in grid_positions:
+		if grid_pos.y >= grid_height - 1:
+			print("Game Over: Block landed in deadzone at height ", grid_pos.y)
+			current_piece.queue_free()
+			if ghost_piece != null:
+				ghost_piece.queue_free()
+			call_deferred("_game_over")
+			return
+	
 	# Store the Node3D for each grid position
 	for grid_pos in grid_positions:
 		if grid_pos.y >= 0 and not grid.has(grid_pos):
 			grid.append(grid_pos)
-			# Store a reference to the block's Node3D (we'll clone the child nodes)
+			# Store a reference to the block's Node3D
 			for child in current_piece.get_children():
 				if child is Node3D:
 					var child_grid_pos = grid_management.grid_position(child.global_position)
@@ -127,7 +151,7 @@ func _on_piece_landed():
 							grid_pos.z * grid_size
 						)
 
-	current_piece.queue_free()  # Add this line to remove the original piece
+	current_piece.queue_free()
 
 	# Clear completed layers and update blocks
 	var clear_result = grid_management.row_complete_handler()
@@ -144,7 +168,6 @@ func _on_piece_landed():
 		for shift in clear_result["shifted_positions"]:
 			var old_pos = shift["old_pos"]
 			var new_pos = shift["new_pos"]
-			# Make sure this block exists and isn't in the removal list
 			if landed_blocks.has(old_pos) and not remove_set.has(old_pos):
 				blocks_to_shift.append({"old_pos": old_pos, "new_pos": new_pos, "block": landed_blocks[old_pos]})
 		
@@ -161,11 +184,9 @@ func _on_piece_landed():
 			var new_pos = shift_data["new_pos"]
 			var block = shift_data["block"]
 			
-			# Remove from old position in dictionary
 			if landed_blocks.has(old_pos):
 				landed_blocks.erase(old_pos)
 			
-			# Add to new position
 			landed_blocks[new_pos] = block
 			block.global_position = Vector3(
 				new_pos.x * grid_size,
@@ -173,11 +194,17 @@ func _on_piece_landed():
 				new_pos.z * grid_size
 			)
 	
-	grid = grid_management.grid  # Update the main grid
+	grid = grid_management.grid
 	call_deferred("_spawn_block")
-func _reload_scene():
+
+func _game_over():
+	print("=== GAME OVER ===")
+	# Optional: Add a delay or game over screen here
+	await get_tree().create_timer(1.0).timeout
 	get_tree().reload_current_scene()
 
+func _reload_scene():
+	_game_over()
 func _create_ground():
 	var ground = MeshInstance3D.new()
 	var plane_mesh = PlaneMesh.new()

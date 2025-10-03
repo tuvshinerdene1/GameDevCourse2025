@@ -61,6 +61,7 @@ func _move_horizontally(delta):
 		if moved and grid_management.can_move_to(new_pos):
 			global_position = new_pos
 			time_since_last_move_hor = 0
+# piece_controller.gd - Updated rotate function with wall kicks
 func _rotate(delta: float):
 	time_since_last_rotate += delta
 	if time_since_last_rotate >= rotate_interval:
@@ -91,17 +92,44 @@ func _rotate(delta: float):
 		
 		if rotated:
 			var original_rotation = rotation
+			var original_position = global_position
 			rotate(rotation_axis, deg_to_rad(90))
 			
 			rotation_degrees.x = round(rotation_degrees.x / 90) * 90
 			rotation_degrees.y = round(rotation_degrees.y / 90) * 90
 			rotation_degrees.z = round(rotation_degrees.z / 90) * 90
 			
+			# Try the rotation at current position first
 			if grid_management.can_rotate_to(self, rotation_degrees):
 				time_since_last_rotate = 0
 			else:
-				rotation = original_rotation
-
+				# Wall kick attempts - try offsetting in different directions
+				var wall_kick_offsets = [
+					Vector3(1, 0, 0) * grid_management.grid_size,   # Right
+					Vector3(-1, 0, 0) * grid_management.grid_size,  # Left
+					Vector3(0, 0, 1) * grid_management.grid_size,   # Forward
+					Vector3(0, 0, -1) * grid_management.grid_size,  # Back
+					Vector3(1, 0, 1) * grid_management.grid_size,   # Diagonal
+					Vector3(-1, 0, 1) * grid_management.grid_size,
+					Vector3(1, 0, -1) * grid_management.grid_size,
+					Vector3(-1, 0, -1) * grid_management.grid_size,
+					Vector3(0, 1, 0) * grid_management.grid_size,   # Up
+					Vector3(2, 0, 0) * grid_management.grid_size,   # 2 blocks right
+					Vector3(-2, 0, 0) * grid_management.grid_size,  # 2 blocks left
+				]
+				
+				var kick_successful = false
+				for offset in wall_kick_offsets:
+					global_position = original_position + offset
+					if grid_management.can_rotate_to(self, rotation_degrees):
+						time_since_last_rotate = 0
+						kick_successful = true
+						break
+				
+				if not kick_successful:
+					# Revert both rotation and position
+					rotation = original_rotation
+					global_position = original_position
 func move_down(grid_size: float) -> bool:
 	var new_pos = global_position + Vector3(0, -1, 0) * grid_size
 	if grid_management.can_move_to(new_pos):
