@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://xfps6kkvm372"]
+[gd_scene load_steps=6 format=3 uid="uid://xfps6kkvm372"]
 
 [ext_resource type="Script" uid="uid://c82iq2yyn4g6u" path="res://main.gd" id="1_ig7tw"]
 
@@ -11,6 +11,19 @@ albedo_color = Color(0.431373, 1, 1, 1)
 [sub_resource type="BoxMesh" id="BoxMesh_ig7tw"]
 material = SubResource("StandardMaterial3D_ig7tw")
 size = Vector3(11, 2, 11)
+
+[sub_resource type="Environment" id="Environment_ig7tw"]
+background_mode = 1
+background_color = Color(0.0302671, 0.0349571, 0.0359371, 1)
+ambient_light_energy = 0.05
+glow_enabled = true
+fog_enabled = true
+fog_mode = 1
+fog_light_color = Color(0.1615, 0.172425, 0.19, 1)
+fog_density = 1.0
+fog_depth_curve = 0.366021
+fog_depth_begin = 1.0
+fog_depth_end = 30.0
 
 [node name="Main" type="Node"]
 script = ExtResource("1_ig7tw")
@@ -42,3 +55,6 @@ shadow_enabled = true
 [node name="DirectionalLight3D4" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.274442, 0.960596, 0.0440208, -0.720305, -0.235688, 0.65239, 0.637058, 0.147334, 0.756604, 5.96658, 10, 16.1959)
 shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_ig7tw")
