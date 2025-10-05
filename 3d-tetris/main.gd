@@ -1,3 +1,4 @@
+# main.gd - Complete integration with Disco Elysium style dialogue
 extends Node
 
 @export var speed: float = 1
@@ -8,6 +9,7 @@ var current_piece: Node3D
 var ghost_piece: Node3D
 var camera_controller: Node
 var shape_factory: ShapeFactory
+var dialogue_system: Control
 
 var move_vector = Vector3(0, -1, 0)
 var time_since_last_move: float = 0.0
@@ -20,8 +22,16 @@ var grid_depth = 5
 var grid_size = 1
 
 var spawn_position: Vector3
-var landed_blocks = {}  # Dictionary to map grid positions to Node3D objects
+var landed_blocks = {}
 var game_over: bool = false
+
+# Story tracking
+var total_layers_cleared: int = 0
+var consecutive_perfect_clears: int = 0
+var near_death_saves: int = 0
+var has_shown_intro: bool = false
+var has_shown_first_clear: bool = false
+var has_shown_near_death: bool = false
 
 func _ready() -> void:
 	shape_factory = ShapeFactory.new()
@@ -30,20 +40,140 @@ func _ready() -> void:
 	_setup_spawn_point()
 	_setup_camera()
 	_create_ground()
-	_spawn_block()
 	_create_deadzone_layer()
+	_setup_dialogue_system()
 	
 	move_interval = 1.0 / speed
+	
+	# Show intro dialogue before spawning first piece
+	if not has_shown_intro:
+		call_deferred("_show_intro_dialogue")
+	else:
+		_spawn_block()
+
+func _setup_dialogue_system():
+	# Load and setup dialogue system
+	dialogue_system = preload("res://DialogueSystem.tscn").instantiate()
+	add_child(dialogue_system)
+	dialogue_system.dialogue_ended.connect(_on_dialogue_ended)
+	dialogue_system.choice_selected.connect(_on_dialogue_choice_selected)
+	
+	# Load portraits (make sure these exist in your project)
+	var portraits = {
+		"narrator": preload("res://icon.svg"),  # Replace with actual portraits
+		"voice_of_logic": preload("res://icon.svg"),
+		# Add more portrait textures here
+	}
+	dialogue_system.load_portraits(portraits)
+
+func _show_intro_dialogue():
+	has_shown_intro = true
+	var intro_tree = _create_intro_dialogue()
+	dialogue_system.load_dialogue_tree(intro_tree)
+	dialogue_system.start_dialogue("start")
+
+func _create_intro_dialogue() -> Dictionary:
+	return {
+		"start": {
+			"speaker": "THE VOID",
+			"speaker_id": "narrator",
+			"text": "You exist in a space between spaces. Geometric shapes fall from an invisible sky, obeying laws you don't remember learning.",
+			"choices": [
+				{"text": "[LOGIC] Analyze the environment", "next": "analyze"},
+				{"text": "[INLAND EMPIRE] Feel the cosmic weight", "next": "cosmic"},
+				{"text": "Accept your purpose", "next": "accept"}
+			]
+		},
+		"analyze": {
+			"speaker": "LOGIC",
+			"speaker_id": "voice_of_logic",
+			"text": "A 5×13×5 grid. Seven tetromino shapes. Rotation in three dimensions. The rules are clear: stack blocks, clear layers, survive.",
+			"next": "end"
+		},
+		"cosmic": {
+			"speaker": "INLAND EMPIRE",
+			"speaker_id": "narrator",
+			"text": "Each falling piece is a memory. Each cleared layer is a small death. The grid is your soul, and you must keep it from overflowing with chaos.",
+			"next": "end"
+		},
+		"accept": {
+			"speaker": "VOLITION",
+			"speaker_id": "voice_of_logic",
+			"text": "Good. No existential crisis today. Just blocks, gravity, and willpower. Let's begin.",
+			"next": "end"
+		},
+		"end": {
+			"speaker": "NARRATOR",
+			"speaker_id": "narrator",
+			"text": "The first piece materializes at the spawn point. Your eternal duty begins now.",
+			"choices": []
+		}
+	}
+
+func _on_dialogue_ended():
+	# Resume game after dialogue
+	if not game_over and current_piece == null:
+		call_deferred("_spawn_block")
+
+func _on_dialogue_choice_selected(choice_index: int, choice_data: Dictionary):
+	# Track player choices for story branching
+	print("Player selected choice: ", choice_index)
+	print("Choice text: ", choice_data.get("text", ""))
 
 func _process(delta: float) -> void:
-	if game_over:
+	if game_over or dialogue_system.is_active:
 		return
+		
 	if current_piece != null:
 		_auto_fall(delta)
 		current_piece.process_movement(delta)
 		if ghost_piece != null:
 			ghost_piece.update_position()
 		camera_controller.camera_rotation()
+		
+		# Check for near-death situation
+		_check_near_death()
+
+func _check_near_death():
+	if has_shown_near_death:
+		return
+		
+	var highest_block = 0
+	for pos in grid:
+		if pos.y > highest_block:
+			highest_block = pos.y
+	
+	# If stack reaches danger zone (2 blocks from top)
+	if highest_block >= grid_height - 3:
+		has_shown_near_death = true
+		_show_near_death_dialogue()
+
+func _show_near_death_dialogue():
+	var tree = {
+		"start": {
+			"speaker": "PERCEPTION",
+			"speaker_id": "narrator",
+			"text": "The stack creeps toward the red zone. Death whispers from above.",
+			"choices": [
+				{"text": "[COMPOSURE - Challenging] Stay calm", "next": "calm"},
+				{"text": "[HALF LIGHT] Panic!", "next": "panic"}
+			]
+		},
+		"calm": {
+			"speaker": "COMPOSURE",
+			"speaker_id": "voice_of_logic",
+			"text": "[COMPOSURE - Success] Your hands are steady. Your mind clear. You've been here before. You can recover.",
+			"choices": []
+		},
+		"panic": {
+			"speaker": "HALF LIGHT",
+			"speaker_id": "narrator",
+			"text": "TOO HIGH! TOO FAST! THE BLOCKS KEEP COMING! You're going to fail! Just like last time! JUST LIKE EVERY TIME!",
+			"choices": []
+		}
+	}
+	dialogue_system.load_dialogue_tree(tree)
+	dialogue_system.start_dialogue("start")
 
 func _setup_spawn_point():
 	spawn_position = Vector3(
@@ -120,7 +250,6 @@ func _auto_fall(delta: float):
 		if current_piece.move_down(grid_size):
 			time_since_last_move = 0
 
-
 func _on_piece_landed():
 	var grid_positions = grid_management.get_piece_grid_positions(current_piece)
 	
@@ -135,7 +264,7 @@ func _on_piece_landed():
 			call_deferred("_game_over")
 			return
 	
-	# Store the Node3D for each grid position and create particles
+	# Store the Node3D for each grid position
 	for grid_pos in grid_positions:
 		if grid_pos.y >= 0 and not grid.has(grid_pos):
 			grid.append(grid_pos)
@@ -158,6 +287,13 @@ func _on_piece_landed():
 	var clear_result = grid_management.row_complete_handler()
 	if clear_result["cleared_layers"] > 0:
 		print("Cleared ", clear_result["cleared_layers"], " layers!")
+		total_layers_cleared += clear_result["cleared_layers"]
+		consecutive_perfect_clears += 1
+		
+		# Show first clear dialogue
+		if not has_shown_first_clear:
+			has_shown_first_clear = true
+			_show_first_clear_dialogue()
 		
 		var remove_set = {}
 		for pos in clear_result["blocks_to_remove"]:
@@ -188,10 +324,39 @@ func _on_piece_landed():
 				new_pos.y * grid_size,
 				new_pos.z * grid_size
 			)
+	else:
+		consecutive_perfect_clears = 0
 	
 	grid = grid_management.grid
 	if not game_over:
 		call_deferred("_spawn_block")
+
+func _show_first_clear_dialogue():
+	var tree = {
+		"start": {
+			"speaker": "ACHIEVEMENT",
+			"speaker_id": "voice_of_logic",
+			"text": "*SUCCESS* - Your first complete layer vanishes. Cells aligned. Order restored from chaos.",
+			"choices": [
+				{"text": "Feel accomplished", "next": "accomplished"},
+				{"text": "Demand more", "next": "more"}
+			]
+		},
+		"accomplished": {
+			"speaker": "EMPATHY",
+			"speaker_id": "narrator",
+			"text": "Those blocks... they served their purpose perfectly. Together, they created something complete. Then they let go.",
+			"choices": []
+		},
+		"more": {
+			"speaker": "ELECTROCHEMISTRY",
+			"speaker_id": "narrator",
+			"text": "YES! Do it AGAIN! Chase that feeling! Clear another layer! And another! FEED THE HUNGER FOR PERFECTION!",
+			"choices": []
+		}
+	}
+	dialogue_system.load_dialogue_tree(tree)
+	dialogue_system.start_dialogue("start")
 
 func _game_over():
 	game_over = true
@@ -202,7 +367,44 @@ func _game_over():
 	if ghost_piece != null:
 		ghost_piece.queue_free()
 		ghost_piece = null
-	await get_tree().create_timer(1.0).timeout
+	
+	# Show game over dialogue
+	var tree = {
+		"start": {
+			"speaker": "THE VOID",
+			"speaker_id": "narrator",
+			"text": "The tower collapses. Blocks scatter into nothing. The red zone claims another victim.",
+			"choices": [
+				{"text": "[VOLITION] Get up. Try again.", "next": "try_again"},
+				{"text": "[LOGIC] Analyze what went wrong", "next": "analyze"},
+				{"text": "[Give up]", "next": "give_up"}
+			]
+		},
+		"try_again": {
+			"speaker": "VOLITION",
+			"speaker_id": "voice_of_logic",
+			"text": "You cleared " + str(total_layers_cleared) + " layers. You can do better. The blocks still need you. They will always need you.",
+			"choices": []
+		},
+		"analyze": {
+			"speaker": "LOGIC",
+			"speaker_id": "voice_of_logic",
+			"text": "Gap management failed. Piece placement sub-optimal. But failure teaches. Next time, you'll see the patterns sooner.",
+			"choices": []
+		},
+		"give_up": {
+			"speaker": "INLAND EMPIRE",
+			"speaker_id": "narrator",
+			"text": "Perhaps the tower was meant to fall. Perhaps entropy always wins. But... will you let it?",
+			"next": "try_again"
+		}
+	}
+	dialogue_system.load_dialogue_tree(tree)
+	dialogue_system.dialogue_ended.connect(_on_game_over_dialogue_ended, CONNECT_ONE_SHOT)
+	dialogue_system.start_dialogue("start")
+
+func _on_game_over_dialogue_ended():
+	await get_tree().create_timer(0.5).timeout
 	get_tree().reload_current_scene()
 
 func _reload_scene():
@@ -268,7 +470,7 @@ func _create_ground():
 	add_child(ground)
 
 func _create_deadzone_layer():
-	var deadzone_height = grid_height - 1  # Top layer
+	var deadzone_height = grid_height - 1
 	var deadzone_y = deadzone_height * grid_size
 	
 	var deadzone_container = Node3D.new()
@@ -277,7 +479,7 @@ func _create_deadzone_layer():
 	
 	var deadzone_material = StandardMaterial3D.new()
 	deadzone_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	deadzone_material.albedo_color = Color(1.0, 0.2, 0.2, 0.02)  # Red with 25% opacity
+	deadzone_material.albedo_color = Color(1.0, 0.2, 0.2, 0.02)
 	deadzone_material.emission_enabled = true
 	deadzone_material.emission = Color(1.0, 0.1, 0.1)
 	deadzone_material.emission_energy_multiplier = 0.3
@@ -290,9 +492,9 @@ func _create_deadzone_layer():
 	plane.material_override = deadzone_material
 	
 	plane.position = Vector3(
-		(grid_width * grid_size) / 1/2,
+		(grid_width * grid_size) / 2.0,
 		deadzone_y,
-		(grid_depth * grid_size) / 1/2
+		(grid_depth * grid_size) / 2.0
 	)
 	
 	deadzone_container.add_child(plane)
