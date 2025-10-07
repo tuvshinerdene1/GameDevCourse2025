@@ -32,6 +32,8 @@ var near_death_saves: int = 0
 var has_shown_intro: bool = false
 var has_shown_first_clear: bool = false
 var has_shown_near_death: bool = false
+static var intro_already_shown: bool = false
+
 
 func _ready() -> void:
 	shape_factory = ShapeFactory.new()
@@ -46,8 +48,10 @@ func _ready() -> void:
 	move_interval = 1.0 / speed
 	
 	# Show intro dialogue before spawning first piece
-	if not has_shown_intro:
-		call_deferred("_show_intro_dialogue")
+	if not intro_already_shown:
+		intro_already_shown = true
+		has_shown_intro = true
+		_show_intro_dialogue()
 	else:
 		_spawn_block()
 
@@ -71,6 +75,7 @@ func _show_intro_dialogue():
 	var intro_tree = _create_intro_dialogue()
 	dialogue_system.load_dialogue_tree(intro_tree)
 	dialogue_system.start_dialogue("start")
+	
 
 func _create_intro_dialogue() -> Dictionary:
 	return {
@@ -113,7 +118,7 @@ func _create_intro_dialogue() -> Dictionary:
 func _on_dialogue_ended():
 	# Resume game after dialogue
 	if not game_over and current_piece == null:
-		call_deferred("_spawn_block")
+		_spawn_block()
 
 func _on_dialogue_choice_selected(choice_index: int, choice_data: Dictionary):
 	# Track player choices for story branching

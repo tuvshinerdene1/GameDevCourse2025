@@ -16,7 +16,7 @@ var dialogue_tree: Dictionary = {}
 var portraits: Dictionary = {}
 
 var is_active: bool = false
-var text_speed: float = 0.03
+var text_speed: float = 0.01
 var current_text: String = ""
 var displayed_text: String = ""
 var text_timer: float = 0.0
@@ -68,6 +68,12 @@ func start_dialogue(node_id: String):
 	get_tree().paused = true
 
 func _display_node(node_id: String):
+	if not dialogue_tree.has(node_id):
+		push_error("Dialogue node not found: " + node_id)
+		return
+
+	current_node_id = node_id  # ✅ FIX — update the current node
+
 	var node = dialogue_tree[node_id]
 	
 	# Update portrait
@@ -95,6 +101,7 @@ func _display_node(node_id: String):
 	if current_text == "":
 		is_text_complete = true
 		_show_choices(node)
+
 
 func _reveal_next_character():
 	if displayed_text.length() < current_text.length():
