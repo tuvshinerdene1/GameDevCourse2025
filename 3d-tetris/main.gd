@@ -17,7 +17,7 @@ var move_interval: float = 0.0
 
 var grid = []
 var grid_width = 5
-var grid_height = 13
+var grid_height = 15
 var grid_depth = 5
 var grid_size = 1
 
@@ -34,6 +34,32 @@ var has_shown_first_clear: bool = false
 var has_shown_near_death: bool = false
 static var intro_already_shown: bool = false
 
+func _setup_skybox():
+	# Create WorldEnvironment if not present
+	var world_env = WorldEnvironment.new()
+	add_child(world_env)
+	
+	# Create Environment resource
+	var env = Environment.new()
+	env.background_mode = Environment.BG_SKY
+	
+	# Create Sky and ShaderMaterial
+	var sky = Sky.new()
+	var sky_material = ShaderMaterial.new()
+	sky_material.shader = preload("res://shaders/new_shader.gdshader")
+	
+	# Customize shader parameters (e.g., for MGS1 red aesthetic)
+	sky_material.set_shader_parameter("hologram_color", Vector3(1.0, 0.3, 0.2))
+	sky_material.set_shader_parameter("grid_intensity", 0.3)
+	
+	sky.sky_material = sky_material
+	env.sky = sky
+	
+	# Assign to WorldEnvironment and tweak lighting
+	world_env.environment = env
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
+	env.ambient_light_color = Color(0.1, 0.1, 0.2) # Dim blue for holographic mood
+	env.ambient_light_energy = 0.4 # Subtle glow on scene objects
 
 func _ready() -> void:
 	shape_factory = ShapeFactory.new()
@@ -46,6 +72,7 @@ func _ready() -> void:
 	_setup_dialogue_system()
 	
 	move_interval = 1.0 / speed
+	#_setup_skybox()
 	
 	# Show intro dialogue before spawning first piece
 	if not intro_already_shown:
