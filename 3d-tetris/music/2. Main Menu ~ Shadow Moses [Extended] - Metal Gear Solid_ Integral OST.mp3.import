@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://8x1bu03nskdb"
+path="res://.godot/imported/2. Main Menu ~ Shadow Moses [Extended] - Metal Gear Solid_ Integral OST.mp3-7eabf7d79b10b59f408565f20ce1bb94.mp3str"
+
+[deps]
+
+source_file="res://music/2. Main Menu ~ Shadow Moses [Extended] - Metal Gear Solid_ Integral OST.mp3"
+dest_files=["res://.godot/imported/2. Main Menu ~ Shadow Moses [Extended] - Metal Gear Solid_ Integral OST.mp3-7eabf7d79b10b59f408565f20ce1bb94.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

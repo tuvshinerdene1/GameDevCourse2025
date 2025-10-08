@@ -12,15 +12,15 @@ func _ready():
 
 func _load_portraits():
 	# Load portrait images - replace with your actual portrait paths
-	portraits["narrator"] = preload("res://icon.svg")
-	portraits["creaky_voice"] = preload("res://icon.svg")
-	portraits["manly_voice"] = preload("res://icon.svg")
-	portraits["michael"] = preload("res://icon.svg")
-	portraits["irons"] = preload("res://icon.svg")
-	portraits["david"] = preload("res://icon.svg")
-	portraits["old_lady"] = preload("res://icon.svg")
-	portraits["friend"] = preload("res://icon.svg")
-	portraits["boy"] = preload("res://icon.svg")
+	portraits["narrator"] = preload("res://portraits/harry.jpeg")
+	portraits["creaky_voice"] = preload("res://portraits/creakyvoice.jpeg")
+	portraits["manly_voice"] = preload("res://portraits/manly.jpeg")
+	portraits["michael"] = preload("res://portraits/boy.png")
+	portraits["irons"] = preload("res://portraits/Irons.jpeg")
+	portraits["david"] = preload("res://portraits/harry.jpeg")
+	portraits["old_lady"] = preload("res://portraits/lady.png")
+	portraits["friend"] = preload("res://portraits/friend.png")
+	portraits["boy"] = preload("res://portraits/glasses.jpeg")
 
 func _load_dialogue_trees():
 	# ========================================

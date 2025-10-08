@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bafo27lb7a5ej"
+path="res://.godot/imported/7. Tank Hangar ~ PS1 Version [Extended] - Metal Gear Solid_ Integral OST.mp3-83b0a340a5872762be77690fe6b4b179.mp3str"
+
+[deps]
+
+source_file="res://music/7. Tank Hangar ~ PS1 Version [Extended] - Metal Gear Solid_ Integral OST.mp3"
+dest_files=["res://.godot/imported/7. Tank Hangar ~ PS1 Version [Extended] - Metal Gear Solid_ Integral OST.mp3-83b0a340a5872762be77690fe6b4b179.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

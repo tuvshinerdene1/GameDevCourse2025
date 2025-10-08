@@ -9,6 +9,7 @@ var ghost_piece: Node3D
 var camera_controller: Node
 var shape_factory: ShapeFactory
 var dialogue_system: Control
+var pause_menu:Control
 
 var move_vector = Vector3(0, -1, 0)
 var time_since_last_move: float = 0.0
@@ -339,29 +340,13 @@ func _game_over():
 			"speaker": "THE VOID",
 			"speaker_id": "narrator",
 			"text": "The tower collapses. Blocks scatter into nothing. The red zone claims another victim.",
-			"choices": [
-				{"text": "[VOLITION] Get up. Try again.", "next": "try_again"},
-				{"text": "[LOGIC] Analyze what went wrong", "next": "analyze"},
-				{"text": "[Give up]", "next": "give_up"}
-			]
+			"next": "try_again"
 		},
 		"try_again": {
 			"speaker": "VOLITION",
 			"speaker_id": "voice_of_logic",
 			"text": "You cleared " + str(total_layers_cleared) + " layers. You can do better. The blocks still need you. They will always need you.",
 			"choices": []
-		},
-		"analyze": {
-			"speaker": "LOGIC",
-			"speaker_id": "voice_of_logic",
-			"text": "Gap management failed. Piece placement sub-optimal. But failure teaches. Next time, you'll see the patterns sooner.",
-			"choices": []
-		},
-		"give_up": {
-			"speaker": "INLAND EMPIRE",
-			"speaker_id": "narrator",
-			"text": "Perhaps the tower was meant to fall. Perhaps entropy always wins. But... will you let it?",
-			"next": "try_again"
 		}
 	}
 	dialogue_system.load_dialogue_tree(tree)
@@ -369,21 +354,28 @@ func _game_over():
 	dialogue_system.start_dialogue("start")
 
 func _on_game_over_dialogue_ended():
-	# Reset to the state at the last dialogue section
-	total_layers_cleared = current_dialogue_index * 3
-	grid = []
+	# Clean up ALL landed blocks properly
+	for block in landed_blocks.values():
+		if is_instance_valid(block):
+			block.queue_free()
+	
 	landed_blocks.clear()
-	for block in get_tree().get_nodes_in_group("landed_blocks"):
-		block.queue_free()
+	grid.clear()
+	
+	# Reset story progress to last checkpoint
+	total_layers_cleared = current_dialogue_index * 3
 	game_over = false
 	has_shown_near_death = false
+	
+	# Wait a frame to ensure cleanup
+	await get_tree().process_frame
+	
 	# Restart the last dialogue section
 	if last_dialogue_id != "":
 		dialogue_system.load_dialogue_tree(DialogueData.dialogue_trees[last_dialogue_id])
 		dialogue_system.start_dialogue("start")
 	else:
 		_spawn_block()
-
 func _create_ground():
 	var ground = MeshInstance3D.new()
 	var plane_mesh = PlaneMesh.new()

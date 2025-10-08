@@ -1,8 +1,9 @@
-[gd_scene load_steps=9 format=3 uid="uid://xfps6kkvm372"]
+[gd_scene load_steps=10 format=3 uid="uid://xfps6kkvm372"]
 
 [ext_resource type="Script" uid="uid://c82iq2yyn4g6u" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="Sky" uid="uid://bi2dhx0aig5lg" path="res://skybox/new_sky.tres" id="2_0xm2m"]
 [ext_resource type="Shader" uid="uid://dtkw4brpln6fd" path="res://shaders/vhs.gdshader" id="3_h2yge"]
+[ext_resource type="AudioStream" uid="uid://b1u1vo41pdsfh" path="res://music/Industrial Harbour - Disco Elysium OST.mp3" id="4_1bvp3"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_7dm0k"]
 size = Vector3(10, 2, 10)
@@ -61,6 +62,7 @@ shadow_enabled = true
 
 [node name="DirectionalLight3D4" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.274442, 0.960596, 0.0440208, -0.720305, -0.235688, 0.65239, 0.637058, 0.147334, 0.756604, 5.96658, 10, 16.1959)
+visible = false
 shadow_enabled = true
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
@@ -73,3 +75,7 @@ offset_bottom = 712.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_ig7tw")
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("4_1bvp3")
+autoplay = true

@@ -32,7 +32,7 @@ func apply_transparent_material(node: Node = null):
 			new_mat = mat.duplicate()
 		else:
 			new_mat = StandardMaterial3D.new()
-		new_mat.albedo_color = Color(1, 1, 1, 0.4)
+		new_mat.albedo_color = Color(1, 1, 1, 0.7)
 		new_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		node.set_surface_override_material(0, new_mat)
 	
