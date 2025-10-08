@@ -15,6 +15,10 @@ run/main_scene="uid://xfps6kkvm372"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+DialogueData="*res://data/DialogueData.gd"
+
 [display]
 
 window/size/viewport_width=1280

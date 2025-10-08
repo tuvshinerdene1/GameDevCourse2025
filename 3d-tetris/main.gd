@@ -1,4 +1,3 @@
-# main.gd - Complete integration with Disco Elysium style dialogue
 extends Node
 
 @export var speed: float = 1
@@ -30,36 +29,42 @@ var total_layers_cleared: int = 0
 var consecutive_perfect_clears: int = 0
 var near_death_saves: int = 0
 var has_shown_intro: bool = false
-var has_shown_first_clear: bool = false
 var has_shown_near_death: bool = false
 static var intro_already_shown: bool = false
 
+# Dialogue progression tracking
+var current_dialogue_index: int = 0
+var last_dialogue_id: String = ""
+var dialogue_sections: Array = [
+	"awakening",
+	"lab_intro",
+	"messy_morning",
+	"lab_interlude_1",
+	"hallway",
+	"street",
+	"lab_interlude_2",
+	"hospital",
+	"lab_interlude_3",
+	"delivery",
+	"epilogue"
+]
+
 func _setup_skybox():
-	# Create WorldEnvironment if not present
 	var world_env = WorldEnvironment.new()
 	add_child(world_env)
-	
-	# Create Environment resource
 	var env = Environment.new()
 	env.background_mode = Environment.BG_SKY
-	
-	# Create Sky and ShaderMaterial
 	var sky = Sky.new()
 	var sky_material = ShaderMaterial.new()
 	sky_material.shader = preload("res://shaders/new_shader.gdshader")
-	
-	# Customize shader parameters (e.g., for MGS1 red aesthetic)
 	sky_material.set_shader_parameter("hologram_color", Vector3(1.0, 0.3, 0.2))
 	sky_material.set_shader_parameter("grid_intensity", 0.3)
-	
 	sky.sky_material = sky_material
 	env.sky = sky
-	
-	# Assign to WorldEnvironment and tweak lighting
 	world_env.environment = env
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-	env.ambient_light_color = Color(0.1, 0.1, 0.2) # Dim blue for holographic mood
-	env.ambient_light_energy = 0.4 # Subtle glow on scene objects
+	env.ambient_light_color = Color(0.1, 0.1, 0.2)
+	env.ambient_light_energy = 0.4
 
 func _ready() -> void:
 	shape_factory = ShapeFactory.new()
@@ -72,9 +77,7 @@ func _ready() -> void:
 	_setup_dialogue_system()
 	
 	move_interval = 1.0 / speed
-	#_setup_skybox()
 	
-	# Show intro dialogue before spawning first piece
 	if not intro_already_shown:
 		intro_already_shown = true
 		has_shown_intro = true
@@ -83,72 +86,26 @@ func _ready() -> void:
 		_spawn_block()
 
 func _setup_dialogue_system():
-	# Load and setup dialogue system
 	dialogue_system = preload("res://DialogueSystem.tscn").instantiate()
 	add_child(dialogue_system)
 	dialogue_system.dialogue_ended.connect(_on_dialogue_ended)
 	dialogue_system.choice_selected.connect(_on_dialogue_choice_selected)
 	
-	# Load portraits (make sure these exist in your project)
-	var portraits = {
-		"narrator": preload("res://icon.svg"),  # Replace with actual portraits
-		"voice_of_logic": preload("res://icon.svg"),
-		# Add more portrait textures here
-	}
-	dialogue_system.load_portraits(portraits)
+	# Load portraits from DialogueData singleton
+	dialogue_system.load_portraits(DialogueData.portraits)
 
 func _show_intro_dialogue():
 	has_shown_intro = true
-	var intro_tree = _create_intro_dialogue()
-	dialogue_system.load_dialogue_tree(intro_tree)
+	dialogue_system.load_dialogue_tree(DialogueData.dialogue_trees["awakening"])
 	dialogue_system.start_dialogue("start")
-	
-
-func _create_intro_dialogue() -> Dictionary:
-	return {
-		"start": {
-			"speaker": "THE VOID",
-			"speaker_id": "narrator",
-			"text": "You exist in a space between spaces. Geometric shapes fall from an invisible sky, obeying laws you don't remember learning.",
-			"choices": [
-				{"text": "[LOGIC] Analyze the environment", "next": "analyze"},
-				{"text": "[INLAND EMPIRE] Feel the cosmic weight", "next": "cosmic"},
-				{"text": "Accept your purpose", "next": "accept"}
-			]
-		},
-		"analyze": {
-			"speaker": "LOGIC",
-			"speaker_id": "voice_of_logic",
-			"text": "A 5×13×5 grid. Seven tetromino shapes. Rotation in three dimensions. The rules are clear: stack blocks, clear layers, survive.",
-			"next": "end"
-		},
-		"cosmic": {
-			"speaker": "INLAND EMPIRE",
-			"speaker_id": "narrator",
-			"text": "Each falling piece is a memory. Each cleared layer is a small death. The grid is your soul, and you must keep it from overflowing with chaos.",
-			"next": "end"
-		},
-		"accept": {
-			"speaker": "VOLITION",
-			"speaker_id": "voice_of_logic",
-			"text": "Good. No existential crisis today. Just blocks, gravity, and willpower. Let's begin.",
-			"next": "end"
-		},
-		"end": {
-			"speaker": "NARRATOR",
-			"speaker_id": "narrator",
-			"text": "The first piece materializes at the spawn point. Your eternal duty begins now.",
-			"choices": []
-		}
-	}
+	current_dialogue_index = 0
+	last_dialogue_id = "awakening"
 
 func _on_dialogue_ended():
-	# Resume game after dialogue
 	if not game_over and current_piece == null:
 		_spawn_block()
 
 func _on_dialogue_choice_selected(choice_index: int, choice_data: Dictionary):
-	# Track player choices for story branching
 	print("Player selected choice: ", choice_index)
 	print("Choice text: ", choice_data.get("text", ""))
 
@@ -162,8 +119,6 @@ func _process(delta: float) -> void:
 		if ghost_piece != null:
 			ghost_piece.update_position()
 		camera_controller.camera_rotation()
-		
-		# Check for near-death situation
 		_check_near_death()
 
 func _check_near_death():
@@ -175,7 +130,6 @@ func _check_near_death():
 		if pos.y > highest_block:
 			highest_block = pos.y
 	
-	# If stack reaches danger zone (2 blocks from top)
 	if highest_block >= grid_height - 3:
 		has_shown_near_death = true
 		_show_near_death_dialogue()
@@ -271,11 +225,11 @@ func _auto_fall(delta: float):
 	time_since_last_move += delta
 	var current_move_interval = move_interval
 	
-	if Input.is_action_just_pressed("boost_left") and Input.is_action_pressed(("boost_right")):
+	if Input.is_action_just_pressed("boost_left") and Input.is_action_just_pressed("boost_right"):
 		current_piece.global_position = ghost_piece.global_position
 		current_piece.move_down(grid_size)
 		time_since_last_move = 0.0
-	elif Input.is_action_pressed("boost_left") or Input.is_action_pressed(("boost_right")):
+	elif Input.is_action_pressed("boost_left") or Input.is_action_pressed("boost_right"):
 		current_move_interval /= boost_multiplier
 	
 	if time_since_last_move >= current_move_interval:
@@ -285,7 +239,6 @@ func _auto_fall(delta: float):
 func _on_piece_landed():
 	var grid_positions = grid_management.get_piece_grid_positions(current_piece)
 	
-	# Check for game over before adding to grid
 	for grid_pos in grid_positions:
 		if grid_pos.y >= grid_height - 1:
 			print("Game Over: Block landed in deadzone at height ", grid_pos.y)
@@ -296,7 +249,6 @@ func _on_piece_landed():
 			call_deferred("_game_over")
 			return
 	
-	# Store the Node3D for each grid position
 	for grid_pos in grid_positions:
 		if grid_pos.y >= 0 and not grid.has(grid_pos):
 			grid.append(grid_pos)
@@ -315,17 +267,11 @@ func _on_piece_landed():
 
 	current_piece.queue_free()
 
-	# Clear completed layers and update blocks
 	var clear_result = grid_management.row_complete_handler()
 	if clear_result["cleared_layers"] > 0:
 		print("Cleared ", clear_result["cleared_layers"], " layers!")
 		total_layers_cleared += clear_result["cleared_layers"]
 		consecutive_perfect_clears += 1
-		
-		# Show first clear dialogue
-		if not has_shown_first_clear:
-			has_shown_first_clear = true
-			_show_first_clear_dialogue()
 		
 		var remove_set = {}
 		for pos in clear_result["blocks_to_remove"]:
@@ -356,6 +302,10 @@ func _on_piece_landed():
 				new_pos.y * grid_size,
 				new_pos.z * grid_size
 			)
+		
+		# Check if enough layers cleared to trigger next dialogue
+		if total_layers_cleared >= (current_dialogue_index + 1) * 3:
+			_trigger_next_dialogue()
 	else:
 		consecutive_perfect_clears = 0
 	
@@ -363,32 +313,15 @@ func _on_piece_landed():
 	if not game_over:
 		call_deferred("_spawn_block")
 
-func _show_first_clear_dialogue():
-	var tree = {
-		"start": {
-			"speaker": "ACHIEVEMENT",
-			"speaker_id": "voice_of_logic",
-			"text": "*SUCCESS* - Your first complete layer vanishes. Cells aligned. Order restored from chaos.",
-			"choices": [
-				{"text": "Feel accomplished", "next": "accomplished"},
-				{"text": "Demand more", "next": "more"}
-			]
-		},
-		"accomplished": {
-			"speaker": "EMPATHY",
-			"speaker_id": "narrator",
-			"text": "Those blocks... they served their purpose perfectly. Together, they created something complete. Then they let go.",
-			"choices": []
-		},
-		"more": {
-			"speaker": "ELECTROCHEMISTRY",
-			"speaker_id": "narrator",
-			"text": "YES! Do it AGAIN! Chase that feeling! Clear another layer! And another! FEED THE HUNGER FOR PERFECTION!",
-			"choices": []
-		}
-	}
-	dialogue_system.load_dialogue_tree(tree)
-	dialogue_system.start_dialogue("start")
+func _trigger_next_dialogue():
+	if current_dialogue_index + 1 < dialogue_sections.size():
+		current_dialogue_index += 1
+		last_dialogue_id = dialogue_sections[current_dialogue_index]
+		dialogue_system.load_dialogue_tree(DialogueData.dialogue_trees[last_dialogue_id])
+		dialogue_system.start_dialogue("start")
+	else:
+		# Optionally handle end of story
+		print("All dialogue sections completed!")
 
 func _game_over():
 	game_over = true
@@ -436,11 +369,20 @@ func _game_over():
 	dialogue_system.start_dialogue("start")
 
 func _on_game_over_dialogue_ended():
-	await get_tree().create_timer(0.5).timeout
-	get_tree().reload_current_scene()
-
-func _reload_scene():
-	_game_over()
+	# Reset to the state at the last dialogue section
+	total_layers_cleared = current_dialogue_index * 3
+	grid = []
+	landed_blocks.clear()
+	for block in get_tree().get_nodes_in_group("landed_blocks"):
+		block.queue_free()
+	game_over = false
+	has_shown_near_death = false
+	# Restart the last dialogue section
+	if last_dialogue_id != "":
+		dialogue_system.load_dialogue_tree(DialogueData.dialogue_trees[last_dialogue_id])
+		dialogue_system.start_dialogue("start")
+	else:
+		_spawn_block()
 
 func _create_ground():
 	var ground = MeshInstance3D.new()
