@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=3 uid="uid://w66rliuefsko"]
 
-[ext_resource type="Script" uid="uid://l6b1b1u6nug0" path="res://main_menu.gd" id="1_6eyaj"]
+[ext_resource type="Script" uid="uid://b15l0iavagi5q" path="res://pause.gd" id="1_aq7p1"]
 [ext_resource type="Shader" uid="uid://bunh6i2gq6gw4" path="res://pause.gdshader" id="2_aq7p1"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_6eyaj"]
@@ -42,7 +42,7 @@ anchor_bottom = 1.0
 offset_right = -654.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_6eyaj")
+script = ExtResource("1_aq7p1")
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="."]
 self_modulate = Color(0.925353, 0.925353, 0.925353, 1)
@@ -107,5 +107,5 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_06t4h")
 theme_override_styles/normal = SubResource("StyleBoxFlat_7vrkn")
 text = "Quit"
 
-[connection signal="pressed" from="VBoxContainer2/VBoxContainer/Button" to="." method="_on_start_pressed"]
-[connection signal="pressed" from="VBoxContainer2/VBoxContainer/Button2" to="." method="_on_quit_pressed"]
+[connection signal="pressed" from="VBoxContainer2/VBoxContainer/Button" to="." method="on_resume_pressed"]
+[connection signal="pressed" from="VBoxContainer2/VBoxContainer/Button2" to="." method="on_exit_pressed"]

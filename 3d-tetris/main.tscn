@@ -62,7 +62,6 @@ shadow_enabled = true
 
 [node name="DirectionalLight3D4" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.274442, 0.960596, 0.0440208, -0.720305, -0.235688, 0.65239, 0.637058, 0.147334, 0.756604, 5.96658, 10, 16.1959)
-visible = false
 shadow_enabled = true
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]

@@ -21,7 +21,7 @@ DialogueData="*res://data/DialogueData.gd"
 
 [display]
 
-window/size/viewport_width=1280
+window/size/viewport_width=1080
 window/size/viewport_height=720
 window/size/mode=3
 window/stretch/mode="canvas_items"
@@ -122,3 +122,7 @@ boost_right={
 "events": [Object(InputEventJoypadButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"button_index":10,"pressure":0.0,"pressed":true,"script":null)
 ]
 }
+
+[rendering]
+
+renderer/rendering_method="mobile"

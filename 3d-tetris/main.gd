@@ -9,7 +9,7 @@ var ghost_piece: Node3D
 var camera_controller: Node
 var shape_factory: ShapeFactory
 var dialogue_system: Control
-var pause_menu:Control
+var pause_menu: Control
 
 var move_vector = Vector3(0, -1, 0)
 var time_since_last_move: float = 0.0
@@ -50,23 +50,6 @@ var dialogue_sections: Array = [
 	"epilogue"
 ]
 
-func _setup_skybox():
-	var world_env = WorldEnvironment.new()
-	add_child(world_env)
-	var env = Environment.new()
-	env.background_mode = Environment.BG_SKY
-	var sky = Sky.new()
-	var sky_material = ShaderMaterial.new()
-	sky_material.shader = preload("res://shaders/new_shader.gdshader")
-	sky_material.set_shader_parameter("hologram_color", Vector3(1.0, 0.3, 0.2))
-	sky_material.set_shader_parameter("grid_intensity", 0.3)
-	sky.sky_material = sky_material
-	env.sky = sky
-	world_env.environment = env
-	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-	env.ambient_light_color = Color(0.1, 0.1, 0.2)
-	env.ambient_light_energy = 0.4
-
 func _ready() -> void:
 	shape_factory = ShapeFactory.new()
 	add_child(shape_factory)
@@ -76,6 +59,7 @@ func _ready() -> void:
 	_create_ground()
 	_create_deadzone_layer()
 	_setup_dialogue_system()
+	_setup_pause_menu()
 	
 	move_interval = 1.0 / speed
 	
@@ -85,6 +69,11 @@ func _ready() -> void:
 		_show_intro_dialogue()
 	else:
 		_spawn_block()
+
+func _setup_pause_menu():
+	# Load the pause menu scene
+	pause_menu = preload("res://pause.tscn").instantiate()
+	add_child(pause_menu)
 
 func _setup_dialogue_system():
 	dialogue_system = preload("res://DialogueSystem.tscn").instantiate()
@@ -111,7 +100,8 @@ func _on_dialogue_choice_selected(choice_index: int, choice_data: Dictionary):
 	print("Choice text: ", choice_data.get("text", ""))
 
 func _process(delta: float) -> void:
-	if game_over or dialogue_system.is_active:
+	# Don't process game logic if paused or in dialogue
+	if game_over or dialogue_system.is_active or get_tree().paused:
 		return
 		
 	if current_piece != null:
@@ -376,6 +366,7 @@ func _on_game_over_dialogue_ended():
 		dialogue_system.start_dialogue("start")
 	else:
 		_spawn_block()
+
 func _create_ground():
 	var ground = MeshInstance3D.new()
 	var plane_mesh = PlaneMesh.new()
@@ -462,5 +453,4 @@ func _create_deadzone_layer():
 		deadzone_y,
 		(grid_depth * grid_size) / 2.0
 	)
-	
 	deadzone_container.add_child(plane)
