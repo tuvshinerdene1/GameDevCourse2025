@@ -222,20 +222,12 @@ radius = 5.0
 
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_hjaqi")
-SPEED = 180.0
-JUMP_VELOCITY = -280.0
-DASH_SPEED = 350
-DASH_DURATION = 0.3
-DASH_COOLDOWN = 0.5
-WALL_JUMP_FORCE = -10.0
-WALL_SLIDE_SPEED = 50.0
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, -12)
 sprite_frames = SubResource("SpriteFrames_oh5ij")
-animation = &"idle"
+animation = &"run"
 autoplay = "idle"
-frame_progress = 0.623487
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -6)
