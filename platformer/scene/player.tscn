@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://bfai3x4mj8oji"]
+[gd_scene load_steps=34 format=3 uid="uid://bfai3x4mj8oji"]
 
 [ext_resource type="Script" uid="uid://dsdvcljdu4ufu" path="res://script/player.gd" id="1_hjaqi"]
 [ext_resource type="Texture2D" uid="uid://c4aa2bypwgcli" path="res://asset/sprites/knight.png" id="1_xo3ru"]
@@ -220,6 +220,9 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_hp4bs"]
 radius = 5.0
 
+[sub_resource type="LabelSettings" id="LabelSettings_hjaqi"]
+font_size = 15
+
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_hjaqi")
 
@@ -244,3 +247,11 @@ position = Vector2(1, -1)
 target_position = Vector2(6, 0)
 collision_mask = 2
 collide_with_areas = true
+
+[node name="Label" type="Label" parent="."]
+offset_left = 6.0
+offset_top = -29.0
+offset_right = 47.0
+offset_bottom = -6.0
+scale = Vector2(0.417072, 0.553411)
+label_settings = SubResource("LabelSettings_hjaqi")
