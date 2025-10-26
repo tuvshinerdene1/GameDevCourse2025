@@ -184,7 +184,7 @@ position = Vector2(118, -223)
 wall_glide_slow = 0.2
 wall_jump_horizontal = 150.0
 oxygen_gliding_decrease = 0.1
-oxygen_decrease_rate = 1.0
+oxygen_decrease_rate = 3.0
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
 position = Vector2(1, -25)
