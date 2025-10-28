@@ -7,25 +7,26 @@ extends CharacterBody2D
 @export var JUMP_CUTOFF := -50.0
 @export var COYOTE_TIME := 0.15
 @export var JUMP_BUFFER := 0.15
-@export var AIR_MOVEMENT_DECREASE := 0.7  
+@export var AIR_MOVEMENT_DECREASE := 0.7
 @export var wall_glide_slow := 0.4
 @export var wall_jump_vertical := -250.0
 @export var wall_jump_horizontal := 200.0
 @export var wall_jump_cutoff := 100.0
 @export var wall_jump_gravity_reduction := 0.5
 @export var oxygen_gliding_decrease := 0.5
-@export var oxygen_decrease_rate := 50.0  
-@export var oxygen_regen_rate := 30.0 
-@export var max_fall_speed := 500.0 
+@export var oxygen_decrease_rate := 50.0
+@export var oxygen_regen_rate := 30.0
+@export var max_fall_speed := 500.0
 
 var coyote_timer := 0.0
 var jump_buffer_timer := 0.0
 var was_on_floor := false
 var oxygen := 100.0
 var is_gliding_wall := false
-var wall_slide := 0  # -1 left, 1 right
-var wall_jump_lockout := 0.0  # Prevents immediate wall re-grab
+var wall_slide := 0 # -1 left, 1 right
+var wall_jump_lockout := 0.0 # Prevents immediate wall re-grab
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity") * 0.85
+var charge := 0
 
 @onready var animated_sprite = $AnimatedSprite2D
 @onready var ray_cast_left = $WallRayCastLeft
@@ -47,13 +48,13 @@ func _physics_process(delta: float):
 	check_wall_collision()
 	handle_jump(delta)
 	apply_gravity(delta)
-	handle_input()
+	change_direction()
 	apply_horizontal_movement(delta)
 	move_and_slide()
+	change_current()
 	update_animation()
-	
-	# Track floor state for coyote time
-	was_on_floor = is_on_floor()
+	track_floor()
+
 func lock_wall_jump(delta):
 	if wall_jump_lockout > 0:
 		wall_jump_lockout -= delta
@@ -73,20 +74,13 @@ func handle_jump(delta):
 	if jump_buffer_timer > 0:
 		jump_buffer_timer -= delta
 	
-	# Floor jump
 	if jump_buffer_timer > 0 and coyote_timer > 0:
-		velocity.y = JUMP_VELOCITY
-		jump_buffer_timer = 0
-		coyote_timer = 0
+		perform_floor_jump()
 	
 	# Wall jump
 	elif jump_buffer_timer > 0 and is_gliding_wall and wall_jump_lockout <= 0:
-		velocity.y = wall_jump_vertical
-		velocity.x = -wall_slide * wall_jump_horizontal
-		jump_buffer_timer = 0
-		wall_jump_lockout = 0.2  # Prevent immediate re-grab
-		animated_sprite.flip_h = velocity.x < 0
-	
+		perform_wall_jump()
+
 	# Variable jump height (release early = shorter jump)
 	if Input.is_action_just_released("jump"):
 		if velocity.y < JUMP_CUTOFF:
@@ -95,7 +89,18 @@ func handle_jump(delta):
 		elif is_gliding_wall and abs(velocity.x) > wall_jump_cutoff:
 			velocity.x = sign(velocity.x) * wall_jump_cutoff
 
-func handle_input():
+func perform_floor_jump():
+		velocity.y = JUMP_VELOCITY
+		jump_buffer_timer = 0
+		coyote_timer = 0
+
+func perform_wall_jump():
+		velocity.y = wall_jump_vertical
+		velocity.x = - wall_slide * wall_jump_horizontal
+		jump_buffer_timer = 0
+		wall_jump_lockout = 0.2 # Prevent immediate re-grab
+		animated_sprite.flip_h = velocity.x < 0
+func change_direction():
 	direction = Input.get_axis("move_left", "move_right")
 	
 	# Flip sprite based on movement
@@ -107,7 +112,7 @@ func apply_gravity(delta: float) -> void:
 	
 	if is_on_floor():
 		oxygen = min(100.0, oxygen + oxygen_regen_rate * delta)
-		return 
+		return
 	
 	var gravity_force = gravity * delta
 	
@@ -118,7 +123,7 @@ func apply_gravity(delta: float) -> void:
 	elif not is_gliding_wall and not is_on_floor() and oxygen > 0 and velocity.y > 0:
 		if Input.is_action_pressed("jump"):
 			gravity_force *= oxygen_gliding_decrease
-			oxygen = max(0.0, oxygen-oxygen_decrease_rate*delta)
+			oxygen = max(0.0, oxygen - oxygen_decrease_rate * delta)
 	
 	velocity.y += gravity_force
 	# Cap fall speed (terminal velocity)
@@ -163,3 +168,23 @@ func check_wall_collision():
 	elif ray_cast_right.is_colliding() and not is_on_floor() and direction >= 0 and velocity.y > 0:
 		is_gliding_wall = true
 		wall_slide = 1
+
+func change_current():
+	if charge == 0:
+		if Input.is_action_just_pressed("negative_current"):
+			charge = -1
+		elif Input.is_action_just_pressed("positive_current"):
+			charge = 1
+	elif charge == 1:
+			if Input.is_action_just_pressed("negative_current"):
+				charge = -1
+			elif Input.is_action_just_pressed("positive_current"):
+				charge = 0
+	elif charge == -1:
+			if Input.is_action_just_pressed("negative_current"):
+				charge = 0
+			elif Input.is_action_just_pressed("positive_current"):
+				charge = 1
+				
+func track_floor():
+	was_on_floor = is_on_floor()
