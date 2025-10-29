@@ -59,7 +59,7 @@ func lock_wall_jump(delta):
 	if wall_jump_lockout > 0:
 		wall_jump_lockout -= delta
 func update_oxygen_label():
-	label.text = "Oxygen: %d%%" % int(oxygen)
+	label.text = "Charge: %d%%v " % int(charge)
 
 func handle_jump(delta):
 	# Coyote time - grace period after leaving ground
