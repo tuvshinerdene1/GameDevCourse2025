@@ -27,6 +27,8 @@ var wall_slide := 0 # -1 left, 1 right
 var wall_jump_lockout := 0.0 # Prevents immediate wall re-grab
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity") * 0.85
 var charge := 0
+var is_launched := false
+var launch_timer := 0.0
 
 @onready var animated_sprite = $AnimatedSprite2D
 @onready var ray_cast_left = $WallRayCastLeft
@@ -46,6 +48,13 @@ func _physics_process(delta: float):
 	update_oxygen_label()
 	lock_wall_jump(delta)
 	check_wall_collision()
+	if is_launched:
+		launch_timer -= delta
+		if launch_timer <= 0:
+			is_launched = false
+		move_and_slide()
+		return
+	
 	handle_jump(delta)
 	apply_gravity(delta)
 	change_direction()
@@ -191,3 +200,11 @@ func track_floor():
 
 func get_charge() -> int:
 	return charge
+
+func set_launched(duration: float) -> void:
+	print("islaunched")
+	is_launched = true
+	launch_timer = duration
+	coyote_timer = 0
+	jump_buffer_timer = 0
+	wall_jump_lockout = 0.2
