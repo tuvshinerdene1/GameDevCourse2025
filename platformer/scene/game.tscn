@@ -1,31 +1,38 @@
-[gd_scene load_steps=4 format=3 uid="uid://vyf2pufwm178"]
+[gd_scene load_steps=7 format=3 uid="uid://vyf2pufwm178"]
 
 [ext_resource type="PackedScene" uid="uid://bfai3x4mj8oji" path="res://scene/player.tscn" id="1_5kiuu"]
+[ext_resource type="Script" uid="uid://diq3m75t6gkwl" path="res://script/game.gd" id="1_p1ry8"]
+[ext_resource type="PackedScene" uid="uid://tmaj5qrsld6u" path="res://rooms/room2.tscn" id="3_p1ry8"]
 [ext_resource type="PackedScene" uid="uid://c3tlvrqh4war3" path="res://rooms/room1.tscn" id="3_xwcet"]
-[ext_resource type="PackedScene" uid="uid://baaanvhrfcneg" path="res://rooms/room2.tscn" id="4_p1ry8"]
+[ext_resource type="Script" uid="uid://bnvbtchcvcs37" path="res://script/room_loader.gd" id="5_p1ry8"]
+[ext_resource type="PackedScene" uid="uid://bgwioyvvujncp" path="res://rooms/room3.tscn" id="6_xlg7c"]
 
 [node name="Game" type="Node2D"]
+script = ExtResource("1_p1ry8")
 
-[node name="Node" type="Node" parent="."]
+[node name="rooms" type="Node" parent="."]
 
-[node name="Camera2D" type="Camera2D" parent="Node"]
-position = Vector2(164, 129)
-scale = Vector2(8.08671, 7.7269)
-zoom = Vector2(2, 2)
-position_smoothing_enabled = true
-position_smoothing_speed = 20.0
+[node name="Room" parent="rooms" instance=ExtResource("3_xwcet")]
 
-[node name="rooms" type="Node" parent="Node"]
+[node name="Room2" parent="rooms" instance=ExtResource("3_p1ry8")]
+position = Vector2(383, 0)
 
-[node name="Room" parent="Node/rooms" instance=ExtResource("3_xwcet")]
-position = Vector2(-1, 2)
+[node name="Room3" parent="rooms" instance=ExtResource("6_xlg7c")]
+position = Vector2(768, 0)
 
-[node name="Room2" parent="Node/rooms" instance=ExtResource("4_p1ry8")]
-position = Vector2(383, -1)
-
-[node name="Player" parent="Node" instance=ExtResource("1_5kiuu")]
+[node name="Player" parent="." instance=ExtResource("1_5kiuu")]
+z_index = 1
 position = Vector2(30, 55)
-wall_glide_slow = 0.2
 wall_jump_horizontal = 150.0
 oxygen_gliding_decrease = 0.1
 oxygen_decrease_rate = 3.0
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position = Vector2(-2, -12)
+scale = Vector2(10, 9.555)
+zoom = Vector2(2.5, 2.5)
+position_smoothing_enabled = true
+position_smoothing_speed = 20.0
+
+[node name="Room_manager" type="Node" parent="."]
+script = ExtResource("5_p1ry8")

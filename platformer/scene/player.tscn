@@ -225,6 +225,8 @@ font_size = 15
 
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_hjaqi")
+AIR_MOVEMENT_DECREASE = 0.5
+wall_glide_slow = 0.2
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, -12)

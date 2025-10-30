@@ -6,6 +6,11 @@ extends Area2D
 @export var bounce_force: float = 500.0         # Same-charge pushback
 @export var launch_speed: float = 700.0         # How fast you fly out
 @export var upward_launch_bonus: float = 150.0  # Extra lift on no-input launch
+@export var positive_orb_color: Color = Color(0, 0.8, 1, 1) # cyan
+@export var negative_orb_color: Color = Color(0,0.5,1,1)
+@export var radius: float = 20.0
+@export var glow: bool = true
+
 
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 @onready var sprite: Sprite2D = $Sprite2D
@@ -131,3 +136,13 @@ func _screen_shake(intensity: float):
 	var camera = get_viewport().get_camera_2d()
 	if camera and camera.has_method("shake"):
 		camera.shake(intensity)
+
+func _draw():
+	var draw_color:Color
+	if(charge == 1):
+		draw_color = positive_orb_color
+	draw_circle(Vector2.ZERO, radius, orb_color)
+	if glow:
+		# Outer glow ring
+		draw_circle(Vector2.ZERO, radius * 1.2, orb_color * Color(1, 1, 1, 0.3))
+		draw_circle(Vector2.ZERO, radius * 1.4, orb_color * Color(1, 1, 1, 0.1))

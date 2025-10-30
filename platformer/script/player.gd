@@ -43,6 +43,7 @@ var is_gliding := false
 func _ready():
 	accel = SPEED / ACCELERATION_DURATION
 	decel = SPEED / DECCELERATION_DURATION
+	add_to_group("player")
 
 func _physics_process(delta: float):
 	update_oxygen_label()
