@@ -17,6 +17,7 @@ extends CharacterBody2D
 @export var oxygen_decrease_rate := 50.0
 @export var oxygen_regen_rate := 30.0
 @export var max_fall_speed := 500.0
+@export var horizontal_momentum := 0.5
 
 var coyote_timer := 0.0
 var jump_buffer_timer := 0.0
@@ -197,8 +198,9 @@ func change_current():
 			charge = 1
 
 func track_floor():
+	if is_on_floor() and not was_on_floor:
+		velocity.x *= horizontal_momentum
 	was_on_floor = is_on_floor()
-
 func get_charge() -> int:
 	return charge
 

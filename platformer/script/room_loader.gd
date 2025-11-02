@@ -11,6 +11,8 @@ var is_transitioning: bool = false
 # Transition overlay (ColorRect for fade effect)
 var transition_overlay: ColorRect
 var canvas_layer: CanvasLayer
+var current_room_scene: PackedScene = null  # Add this variable at the top
+var current_spawn_point: String = "Spawn"   # Track current spawn point
 
 func _ready() -> void:
 	# Create canvas layer to keep overlay on top of camera
@@ -45,10 +47,15 @@ func change_room(next_room_path: String, spawn_point_name: String = "Spawn") -> 
 	await fade_in()
 	is_transitioning = false
 
+# Update load_room to store the current room scene
 func load_room(packed: PackedScene, spawn_point_name: String = "Spawn") -> void:
 	if not packed:
 		push_error("PackedScene is null!")
 		return
+	
+	# Store current room info for restarts
+	current_room_scene = packed
+	current_spawn_point = spawn_point_name
 	
 	if current_room:
 		current_room.queue_free()
@@ -78,6 +85,21 @@ func load_room(packed: PackedScene, spawn_point_name: String = "Spawn") -> void:
 		push_warning("No spawn point '%s' in %s" % [spawn_point_name, packed.resource_path])
 	
 	connect_exits(current_room)
+
+# Add this new method to restart the current room
+func restart_current_room() -> void:
+	if is_transitioning:
+		return
+	
+	if not current_room_scene:
+		push_error("No current room to restart!")
+		return
+	
+	is_transitioning = true
+	await fade_out()
+	load_room(current_room_scene, current_spawn_point)
+	await fade_in()
+	is_transitioning = false
 
 func find_spawn_point(room: Node, marker_name: String) -> Node2D:
 	return room.find_child(marker_name, true, false) as Node2D

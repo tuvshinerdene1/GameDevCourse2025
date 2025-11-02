@@ -50,32 +50,32 @@ func _physics_process(delta: float) -> void:
 		player.velocity = push_dir * bounce_force
 		
 	
-# func _check_charge_flip():
-# 	if not was_charge_flipped and Input.is_action_just_pressed("positive_current"):
-# 		was_charge_flipped = true
-# 		_launch_player()
-# 	elif not was_charge_flipped and Input.is_action_just_pressed("negative_current"):
-# 		was_charge_flipped = true
-# 		_launch_player()
-
 func _check_charge_flip():
-	if not was_charge_flipped and charge != 0:
-		if charge == 1:
-			if Input.is_action_just_pressed("negative_current"):
-				was_charge_flipped = true
-				going_out_orb()
-				return
-			elif Input.is_action_just_pressed("positive_current"):
-				was_charge_flipped = true
-				_launch_player()
-		elif charge == -1:
-			if Input.is_action_just_pressed("positive_current"):
-				was_charge_flipped = true
-				going_out_orb()
-				return
-			elif Input.is_action_just_pressed("negative_current"):
-				was_charge_flipped = true
-				_launch_player()
+	if not was_charge_flipped and Input.is_action_just_pressed("positive_current"):
+		was_charge_flipped = true
+		_launch_player()
+	elif not was_charge_flipped and Input.is_action_just_pressed("negative_current"):
+		was_charge_flipped = true
+		_launch_player()
+
+#func _check_charge_flip():
+	#if not was_charge_flipped and charge != 0:
+		#if charge == 1:
+			#if Input.is_action_just_pressed("negative_current"):
+				#was_charge_flipped = true
+				#going_out_orb()
+				#return
+			#elif Input.is_action_just_pressed("positive_current"):
+				#was_charge_flipped = true
+				#_launch_player()
+		#elif charge == -1:
+			#if Input.is_action_just_pressed("positive_current"):
+				#was_charge_flipped = true
+				#going_out_orb()
+				#return
+			#elif Input.is_action_just_pressed("negative_current"):
+				#was_charge_flipped = true
+				#_launch_player()
 
 func _launch_player():
 	var input_dir = Vector2(

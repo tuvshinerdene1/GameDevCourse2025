@@ -15,8 +15,12 @@ func _on_body_entered(body: Node2D) -> void:
 	
 	_dead = true # Prevent double-trigger
 	
-	# Defer the scene reload to avoid physics callback issues
-	get_tree().call_deferred("reload_current_scene")
-	
-	# Optionally queue_free the spike (deferred as well)
-	call_deferred("queue_free")
+	# Find the RoomLoader and restart current room
+	var room_loader = get_tree().root.find_child("RoomManager", true, false)
+	if room_loader and room_loader.has_method("restart_current_room"):
+		call_deferred("_restart_room", room_loader)
+	else:
+		push_error("RoomLoader not found or doesn't have restart_current_room method!")
+
+func _restart_room(room_loader: Node) -> void:
+	room_loader.restart_current_room()
