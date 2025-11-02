@@ -1,7 +1,8 @@
-[gd_scene load_steps=9 format=4 uid="uid://c3tlvrqh4war3"]
+[gd_scene load_steps=10 format=4 uid="uid://c3tlvrqh4war3"]
 
 [ext_resource type="Texture2D" uid="uid://mj61rviyscfb" path="res://asset/sprites/world_tileset.png" id="1_2oaup"]
 [ext_resource type="Texture2D" uid="uid://mfkespubtear" path="res://asset/sprites/spike.png" id="2_ilnpg"]
+[ext_resource type="Script" uid="uid://dwa5p7xnllqy1" path="res://script/camera_2d.gd" id="3_yv82f"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mvttx"]
 texture = ExtResource("1_2oaup")
@@ -326,8 +327,8 @@ tile_map_data = PackedByteArray("AAAAAAAAAAAAAAEAAAABAAAAAAAAAAEAAAACAAAAAAAAAAE
 tile_set = SubResource("TileSet_bdfyo")
 
 [node name="exit_right" type="Area2D" parent="."]
-metadata/target_room = "res://rooms/room2.tscn"
 metadata/spawn_point = "spawn_left"
+metadata/target_room = "res://rooms/room2.tscn"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="exit_right"]
 position = Vector2(376, 224)
@@ -335,3 +336,15 @@ shape = SubResource("RectangleShape2D_n2rm1")
 
 [node name="Spawn" type="Marker2D" parent="."]
 position = Vector2(32, 24)
+
+[node name="RoomBounds" type="Node2D" parent="."]
+metadata/size = Vector2(0, 0)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(0, 1)
+script = ExtResource("3_yv82f")
+bounds_node_path = NodePath("../ReferenceRect")
+
+[node name="ReferenceRect" type="ReferenceRect" parent="."]
+offset_right = 384.0
+offset_bottom = 271.0

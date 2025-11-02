@@ -2,61 +2,81 @@ extends Node
 
 @export var start_room: PackedScene
 @export var player_scene: PackedScene
+@export var transition_duration: float = 0.3  # Transition speed in seconds
 
 var current_room: Node = null
 var player: Node = null
+var is_transitioning: bool = false
+
+# Transition overlay (ColorRect for fade effect)
+var transition_overlay: ColorRect
+var canvas_layer: CanvasLayer
 
 func _ready() -> void:
-	print("=== RoomManager debug ===")
-	print("start_room assigned? ", start_room != null)
-	if start_room:
-		print("start_room path: ", start_room.resource_path)
-	else:
-		print("start_room is NULL")
-	print("player_scene assigned? ", player_scene != null)
-	print("==========================")
-
+	# Create canvas layer to keep overlay on top of camera
+	canvas_layer = CanvasLayer.new()
+	canvas_layer.layer = 100  # High layer to stay on top
+	add_child(canvas_layer)
+	
+	# Create transition overlay
+	transition_overlay = ColorRect.new()
+	transition_overlay.color = Color.BLACK
+	transition_overlay.size = get_viewport().get_visible_rect().size
+	transition_overlay.position = Vector2(-transition_overlay.size.x, 0)  # Start off-screen
+	canvas_layer.add_child(transition_overlay)
+	
 	if not start_room:
 		push_error("start_room is not assigned!")
 		return
 	load_room(start_room)
 
 func change_room(next_room_path: String, spawn_point_name: String = "Spawn") -> void:
+	if is_transitioning:
+		return  # Prevent multiple transitions at once
+	
 	var next_packed = load(next_room_path) as PackedScene
 	if not next_packed:
 		push_error("Room not found: %s" % next_room_path)
 		return
-	call_deferred("load_room", next_packed, spawn_point_name)
+	
+	is_transitioning = true
+	await fade_out()
+	load_room(next_packed, spawn_point_name)
+	await fade_in()
+	is_transitioning = false
 
 func load_room(packed: PackedScene, spawn_point_name: String = "Spawn") -> void:
 	if not packed:
 		push_error("PackedScene is null!")
 		return
-
+	
 	if current_room:
 		current_room.queue_free()
 		current_room = null
-
+	
 	current_room = packed.instantiate()
 	if not current_room:
 		push_error("Failed to instantiate: %s" % packed.resource_path)
 		return
-
 	add_child(current_room)
-
+	
+	# Move room behind transition overlay
+	move_child(current_room, 0)
+	
 	if not player:
 		if not player_scene:
 			push_error("player_scene is not set!")
 			return
 		player = player_scene.instantiate()
 		add_child(player)
-
+		move_child(player, 1)  # Player above room, below overlay
+	
 	var spawn = find_spawn_point(current_room, spawn_point_name)
 	if spawn:
 		player.global_position = spawn.global_position
 	else:
 		push_warning("No spawn point '%s' in %s" % [spawn_point_name, packed.resource_path])
-
+	
 	connect_exits(current_room)
 
 func find_spawn_point(room: Node, marker_name: String) -> Node2D:
@@ -70,10 +90,31 @@ func connect_exits(room: Node) -> void:
 			node.connect("body_entered", Callable(self, "_on_exit_entered").bind(node))
 
 func _on_exit_entered(body: Node, exit_area: Area2D) -> void:
-	if body != player:
+	if body != player or is_transitioning:
 		return
-
+	
 	var target_room: String = exit_area.get_meta("target_room") as String
 	var spawn_point: String = exit_area.get_meta("spawn_point", "Spawn") as String
-
 	call_deferred("change_room", target_room, spawn_point)
+
+func get_current_room() -> Node:
+	return current_room
+
+# Transition effects
+func fade_out() -> void:
+	# Start overlay off-screen to the left
+	var viewport_width = get_viewport().get_visible_rect().size.x
+	transition_overlay.position.x = -viewport_width
+	transition_overlay.modulate.a = 1.0
+	
+	# Slide in from left to cover screen
+	var tween = create_tween()
+	tween.tween_property(transition_overlay, "position:x", 0.0, transition_duration).set_ease(Tween.EASE_IN_OUT)
+	await tween.finished
+
+func fade_in() -> void:
+	# Slide out to the right
+	var viewport_width = get_viewport().get_visible_rect().size.x
+	var tween = create_tween()
+	tween.tween_property(transition_overlay, "position:x", viewport_width, transition_duration).set_ease(Tween.EASE_IN_OUT)
+	await tween.finished

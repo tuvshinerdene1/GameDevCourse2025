@@ -226,6 +226,7 @@ font_size = 15
 [node name="Player" type="CharacterBody2D"]
 z_index = 10
 script = ExtResource("1_hjaqi")
+SPEED = 85.0
 AIR_MOVEMENT_DECREASE = 0.5
 wall_glide_slow = 0.2
 

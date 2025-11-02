@@ -195,7 +195,7 @@ func change_current():
 			charge = 0
 		elif Input.is_action_just_pressed("positive_current"):
 			charge = 1
-				
+
 func track_floor():
 	was_on_floor = is_on_floor()
 
