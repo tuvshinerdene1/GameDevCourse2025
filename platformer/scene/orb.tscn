@@ -1,7 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://dn2yjbgwtqk5u"]
+[gd_scene load_steps=3 format=3 uid="uid://dn2yjbgwtqk5u"]
 
 [ext_resource type="Script" uid="uid://bdwrd52vnwa4" path="res://script/orb.gd" id="1_k0xuc"]
-[ext_resource type="Script" uid="uid://cbeioynmesd30" path="res://script/orb_visual.gd" id="2_s2b5y"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_tbdel"]
 radius = 20.0
@@ -18,8 +17,3 @@ metadata/_edit_horizontal_guides_ = [-11.0]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_tbdel")
-
-[node name="orbVisual" type="Node2D" parent="."]
-visible = false
-script = ExtResource("2_s2b5y")
-orb_color = Color(0.992157, 0.152941, 0.717647, 1)
