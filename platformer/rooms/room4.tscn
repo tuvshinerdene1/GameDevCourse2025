@@ -336,8 +336,20 @@ metadata/spawn_point = "spawn_left"
 position = Vector2(376, 224)
 shape = SubResource("RectangleShape2D_n2rm1")
 
+[node name="exit_left" type="Area2D" parent="."]
+position = Vector2(-368, 13)
+metadata/target_room = "res://rooms/room3.tscn"
+metadata/spawn_point = "spawn_right"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="exit_left"]
+position = Vector2(376, 224)
+shape = SubResource("RectangleShape2D_n2rm1")
+
 [node name="spawn_left" type="Marker2D" parent="."]
 position = Vector2(7, 232)
+
+[node name="spawn_right" type="Marker2D" parent="."]
+position = Vector2(352, 218)
 
 [node name="RoomBounds" type="Node2D" parent="."]
 metadata/size = Vector2(0, 0)

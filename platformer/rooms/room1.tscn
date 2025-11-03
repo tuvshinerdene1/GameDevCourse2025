@@ -338,6 +338,9 @@ shape = SubResource("RectangleShape2D_n2rm1")
 [node name="Spawn" type="Marker2D" parent="."]
 position = Vector2(27, 240)
 
+[node name="spawn_left" type="Marker2D" parent="."]
+position = Vector2(360, 224)
+
 [node name="RoomBounds" type="Node2D" parent="."]
 metadata/size = Vector2(0, 0)
 
