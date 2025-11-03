@@ -315,7 +315,7 @@ sources/0 = SubResource("TileSetAtlasSource_wb5om")
 sources/1 = SubResource("TileSetAtlasSource_6436r")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_n2rm1"]
-size = Vector2(16, 32)
+size = Vector2(16, 44)
 
 [node name="Room" type="Node2D"]
 
@@ -342,7 +342,7 @@ metadata/target_room = "res://rooms/room2.tscn"
 metadata/spawn_point = "spawn_right"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="exit_left"]
-position = Vector2(379, 221)
+position = Vector2(379, 215)
 shape = SubResource("RectangleShape2D_n2rm1")
 
 [node name="spawn_left" type="Marker2D" parent="."]
