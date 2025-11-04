@@ -50,6 +50,7 @@ func _physics_process(delta: float):
 	update_oxygen_label()
 	lock_wall_jump(delta)
 	check_wall_collision()
+
 	if is_launched:
 		launch_timer -= delta
 		if launch_timer <= 0:
@@ -89,7 +90,7 @@ func handle_jump(delta):
 		perform_floor_jump()
 	
 	# Wall jump
-	elif jump_buffer_timer > 0 and is_gliding_wall and wall_jump_lockout <= 0:
+	elif jump_buffer_timer > 0 and is_gliding_wall and wall_jump_lockout <= 0 and coyote_timer > 0 and (Input.is_action_pressed("move_left") or Input.is_action_pressed("move_right")):
 		perform_wall_jump()
 
 	# Variable jump height (release early = shorter jump)
@@ -107,7 +108,7 @@ func perform_floor_jump():
 
 func perform_wall_jump():
 		velocity.y = wall_jump_vertical
-		velocity.x = - wall_slide * wall_jump_horizontal
+		velocity.x = direction * wall_slide * wall_jump_horizontal
 		jump_buffer_timer = 0
 		wall_jump_lockout = 0.2 # Prevent immediate re-grab
 		animated_sprite.flip_h = velocity.x < 0
