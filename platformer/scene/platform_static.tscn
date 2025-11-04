@@ -1,0 +1,46 @@
+[gd_scene load_steps=8 format=3 uid="uid://wrevci1pd52y"]
+
+[ext_resource type="Script" uid="uid://dqccadch6xf88" path="res://script/platform_static.gd" id="1_xepdb"]
+[ext_resource type="Texture2D" uid="uid://ckrlh33uj3dpn" path="res://asset/sprites/positive_static_platform.png" id="2_bsvlv"]
+[ext_resource type="Texture2D" uid="uid://ptfjleqw7xoi" path="res://asset/sprites/negative_static_platform.png" id="2_xepdb"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j2qxj"]
+atlas = ExtResource("2_bsvlv")
+region = Rect2(0, 0, 32, 9)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wirn8"]
+atlas = ExtResource("2_xepdb")
+region = Rect2(0, 0, 32, 9)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_y342x"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j2qxj")
+}],
+"loop": true,
+"name": &"negative",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wirn8")
+}],
+"loop": true,
+"name": &"positive",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wfaay"]
+size = Vector2(32, 8)
+
+[node name="Platform" type="AnimatableBody2D" groups=["platform_static"]]
+script = ExtResource("1_xepdb")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_y342x")
+animation = &"positive"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_wfaay")
+one_way_collision = true

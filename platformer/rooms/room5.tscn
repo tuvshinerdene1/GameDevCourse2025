@@ -1,10 +1,11 @@
-[gd_scene load_steps=12 format=4 uid="uid://dlpawkmxjp2bn"]
+[gd_scene load_steps=13 format=4 uid="uid://dlpawkmxjp2bn"]
 
 [ext_resource type="Texture2D" uid="uid://mj61rviyscfb" path="res://asset/sprites/world_tileset.png" id="1_w18et"]
 [ext_resource type="Texture2D" uid="uid://mfkespubtear" path="res://asset/sprites/spike.png" id="2_geci1"]
 [ext_resource type="Script" uid="uid://dwa5p7xnllqy1" path="res://script/camera_2d.gd" id="3_kqd4i"]
 [ext_resource type="PackedScene" uid="uid://0cmo0fvhxbmn" path="res://scene/spike.tscn" id="4_vh6jf"]
 [ext_resource type="PackedScene" uid="uid://dn2yjbgwtqk5u" path="res://scene/orb.tscn" id="5_k3hnv"]
+[ext_resource type="PackedScene" uid="uid://dillaf3rjljlp" path="res://scene/platform.tscn" id="6_geci1"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mvttx"]
 texture = ExtResource("1_w18et")
@@ -416,3 +417,7 @@ position = Vector2(160, 73)
 
 [node name="Orb4" parent="." instance=ExtResource("5_k3hnv")]
 position = Vector2(257, 200)
+
+[node name="Platform" parent="." instance=ExtResource("6_geci1")]
+position = Vector2(168, 200)
+distance = 50.0
