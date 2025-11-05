@@ -16,9 +16,6 @@ extends CharacterBody2D
 @export var wall_jump_cutoff := 100.0
 @export var wall_jump_lockout_duration := 0.15  # Reduced lockout
 @export var wall_jump_input_lock := 0.12  # Reduced input lock
-@export var oxygen_gliding_decrease := 0.5
-@export var oxygen_decrease_rate := 50.0
-@export var oxygen_regen_rate := 30.0
 @export var max_fall_speed := 500.0
 @export var horizontal_momentum := 0.5
 
@@ -26,7 +23,6 @@ var coyote_timer := 0.0
 var jump_buffer_timer := 0.0
 var wall_coyote_timer := 0.0  # Separate coyote time for walls
 var was_on_floor := false
-var oxygen := 100.0
 var is_gliding_wall := false
 var was_gliding_wall := false  # Track previous wall glide state
 var wall_slide := 0 # -1 left, 1 right
@@ -56,7 +52,7 @@ func _ready():
 	add_to_group("player")
 
 func _physics_process(delta: float):
-	update_oxygen_label()
+	#update_oxygen_label()
 	lock_wall_jump(delta)
 	check_wall_collision()
 
@@ -170,7 +166,6 @@ func apply_gravity(delta: float) -> void:
 	is_gliding = false
 	
 	if is_on_floor():
-		oxygen = min(100.0, oxygen + oxygen_regen_rate * delta)
 		return
 	
 	var gravity_force = gravity * delta

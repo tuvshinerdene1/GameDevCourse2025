@@ -575,7 +575,6 @@ AIR_MOVEMENT_DECREASE = 0.5
 wall_glide_slow = 0.2
 wall_jump_vertical = -200.0
 wall_jump_horizontal = 150.0
-oxygen_gliding_decrease = 0.1
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, -12)

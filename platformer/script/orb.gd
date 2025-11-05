@@ -11,6 +11,7 @@ extends Area2D
 @export var glow: bool = true
 
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
+
 var player: CharacterBody2D = null
 var is_player_inside: bool = false
 var was_charge_flipped: bool = false
