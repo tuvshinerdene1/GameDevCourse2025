@@ -1,13 +1,13 @@
-[gd_scene load_steps=12 format=4 uid="uid://d0g2q2ncv5vrj"]
+[gd_scene load_steps=12 format=4 uid="uid://bvmjyla36k5a5"]
 
-[ext_resource type="Texture2D" uid="uid://mj61rviyscfb" path="res://asset/sprites/world_tileset.png" id="1_rwobn"]
-[ext_resource type="Texture2D" uid="uid://mfkespubtear" path="res://asset/sprites/spike.png" id="2_thyu6"]
-[ext_resource type="Script" uid="uid://dwa5p7xnllqy1" path="res://script/camera_2d.gd" id="3_kn1s0"]
-[ext_resource type="PackedScene" uid="uid://0cmo0fvhxbmn" path="res://scene/spike.tscn" id="4_25806"]
-[ext_resource type="PackedScene" uid="uid://wrevci1pd52y" path="res://scene/platform_static.tscn" id="4_rwobn"]
+[ext_resource type="Texture2D" uid="uid://mj61rviyscfb" path="res://asset/sprites/world_tileset.png" id="1_q0i8w"]
+[ext_resource type="Texture2D" uid="uid://mfkespubtear" path="res://asset/sprites/spike.png" id="2_wftco"]
+[ext_resource type="Script" uid="uid://dwa5p7xnllqy1" path="res://script/camera_2d.gd" id="3_syauk"]
+[ext_resource type="PackedScene" uid="uid://0cmo0fvhxbmn" path="res://scene/spike.tscn" id="4_osuhy"]
+[ext_resource type="PackedScene" uid="uid://dillaf3rjljlp" path="res://scene/platform.tscn" id="5_1434n"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mvttx"]
-texture = ExtResource("1_rwobn")
+texture = ExtResource("1_q0i8w")
 0:0/0 = 0
 1:0/0 = 0
 2:0/0 = 0
@@ -141,7 +141,7 @@ physics_layer_0/collision_layer = 1
 sources/0 = SubResource("TileSetAtlasSource_mvttx")
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wb5om"]
-texture = ExtResource("1_rwobn")
+texture = ExtResource("1_q0i8w")
 0:0/0 = 0
 0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 1:0/0 = 0
@@ -303,7 +303,7 @@ texture = ExtResource("1_rwobn")
 3:15/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_6436r"]
-texture = ExtResource("2_thyu6")
+texture = ExtResource("2_wftco")
 0:0/0 = 0
 1:0/0 = 0
 2:0/0 = 0
@@ -324,11 +324,11 @@ size = Vector2(6, 36)
 tile_set = SubResource("TileSet_5woho")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="."]
-tile_map_data = PackedByteArray("AAABABAAAAAAAAAAAAACABAAAAAAAAAAAAAEABAAAAAAAAAAAAADABAAAAAAAAAAAAAFABAAAAAAAAAAAAAGABAAAAAAAAAAAAAHABAAAAAAAAAAAAAIABAAAAAAAAAAAAAJABAAAAAAAAAAAAAKABAAAAAAAAAAAAALABAAAAAAAAAAAAAMABAAAAAAAAAAAAANABAAAAAAAAAAAAAOABAAAAAAAAAAAAAPABAAAAAAAAAAAAAQABAAAAAAAAAAAAARABAAAAAAAAAAAAASABAAAAAAAAAAAAATABAAAAAAAAAAAAAUABAAAAAAAAAAAAAVABAAAAAAAAAAAAAWABAAAAAAAAAAAAABAAAAAAAAAAAAADACAAAAAAAAAAAAADADAAAAAAAAAAAAADAEAAAAAAAAAAAAADAFAAAAAAAAAAAAADAGAAAAAAAAAAAAADAHAAAAAAAAAAAAADAIAAAAAAAAAAAAADAJAAAAAAAAAAAAADAKAAAAAAAAAAAAADALAAAAAAAAAAAAADAMAAAAAAAAAAAAADANAAAAAAAAAAAAADAOAAAAAAAAAAAAADAPAAAAAAAAAAAAADAQAAAAAAAAAAAAADARAAAAAAAAAAAAADASAAAAAAAAAAAAADATAAAAAAAAAAAAADAUAAAAAAAAAAAAADAVAAAAAAAAAAAAADAWAAAAAAAAAAAAADAXAAEAAAAAAAAAAGAXAAIAAAAAAAAAAGAXAAMAAAAAAAAAAGAXAAQAAAAAAAAAAGAXAAUAAAAAAAAAAGAXAAYAAAAAAAAAAGAXAAcAAAAAAAAAAGAXAAgAAAAAAAAAAGAXAAkAAAAAAAAAAGAXAAoAAAAAAAAAAGAXAAsAAAAAAAAAAGAXAAwAAAAAAAAAAGAXAA0AAAAAAAAAAGAAAAEAAAAAAAAAAFAAAAIAAAAAAAAAAFAAAAMAAAAAAAAAAFAAAAQAAAAAAAAAAFAAAAUAAAAAAAAAAFAAAAYAAAAAAAAAAFAAAAcAAAAAAAAAAFAAAAgAAAAAAAAAAFAAAAkAAAAAAAAAAFAAAAoAAAAAAAAAAFAAAAsAAAAAAAAAAFAAAAwAAAAAAAAAAFAAAA0AAAAAAAAAAFAAABAAAAABAAAAAFAXABAAAAABAAAAAAAXAAAAAAABAAAAAGAAAAAAAAABAAAAADAYABAAAAAAAAAAAAAZABAAAAAAAAAAAAAaABAAAAAAAAAAAAAbABAAAAAAAAAAAAD//xAAAAAAAAAAAAD+/xAAAAAAAAAAAAD9/xAAAAAAAAAAAAD8/xAAAAAAAAAAAAD7/xAAAAAAAAAAAAA=")
+tile_map_data = PackedByteArray("AAABABAAAAAAAAAAAAACABAAAAAAAAAAAAAEABAAAAAAAAAAAAADABAAAAAAAAAAAAAFABAAAAAAAAAAAAAGABAAAAAAAAAAAAAHABAAAAAAAAAAAAAIABAAAAAAAAAAAAAJABAAAAAAAAAAAAAKABAAAAAAAAAAAAALABAAAAAAAAAAAAAMABAAAAAAAAAAAAANABAAAAAAAAAAAAAOABAAAAAAAAAAAAAPABAAAAAAAAAAAAAQABAAAAAAAAAAAAARABAAAAAAAAAAAAASABAAAAAAAAAAAAATABAAAAAAAAAAAAAUABAAAAAAAAAAAAAVABAAAAAAAAAAAAAWABAAAAAAAAAAAAABAAAAAAAAAAAAADACAAAAAAAAAAAAADADAAAAAAAAAAAAADAEAAAAAAAAAAAAADAFAAAAAAAAAAAAADAGAAAAAAAAAAAAADAHAAAAAAAAAAAAADAIAAAAAAAAAAAAADAJAAAAAAAAAAAAADAKAAAAAAAAAAAAADALAAAAAAAAAAAAADAMAAAAAAAAAAAAADANAAAAAAAAAAAAADAOAAAAAAAAAAAAADAPAAAAAAAAAAAAADAQAAAAAAAAAAAAADARAAAAAAAAAAAAADASAAAAAAAAAAAAADATAAAAAAAAAAAAADAUAAAAAAAAAAAAADAVAAAAAAAAAAAAADAWAAAAAAAAAAAAADAXAAEAAAAAAAAAAGAXAAIAAAAAAAAAAGAXAAMAAAAAAAAAAGAXAAQAAAAAAAAAAGAXAAUAAAAAAAAAAGAXAAYAAAAAAAAAAGAXAAcAAAAAAAAAAGAXAAgAAAAAAAAAAGAXAAkAAAAAAAAAAGAXAAoAAAAAAAAAAGAXAAsAAAAAAAAAAGAXAAwAAAAAAAAAAGAXAA0AAAAAAAAAAGAAAAEAAAAAAAAAAFAAAAIAAAAAAAAAAFAAAAMAAAAAAAAAAFAAAAQAAAAAAAAAAFAAAAUAAAAAAAAAAFAAAAYAAAAAAAAAAFAAAAcAAAAAAAAAAFAAAAgAAAAAAAAAAFAAAAkAAAAAAAAAAFAAAAoAAAAAAAAAAFAAAAsAAAAAAAAAAFAAAAwAAAAAAAAAAFAAAA0AAAAAAAAAAFAAABAAAAABAAAAAFAXABAAAAABAAAAAAAXAAAAAAABAAAAAGAAAAAAAAABAAAAADAYABAAAAAAAAAAAAAZABAAAAAAAAAAAAAaABAAAAAAAAAAAAAbABAAAAAAAAAAAAD//xAAAAAAAAAAAAD+/xAAAAAAAAAAAAD9/xAAAAAAAAAAAAD8/xAAAAAAAAAAAAD7/xAAAAAAAAAAAAADAA8AAAAAAAEAAAAEAA8AAAAAAAEAAAAEAA4AAAAAAAEAAAATAA4AAAAAAAEAAAATAA8AAAAAAAEAAAAUAA8AAAAAAAEAAAAFAAgAAAAAAAEAAAAGAAgAAAAAAAEAAAAHAAgAAAAAAAEAAAAIAAgAAAAAAAEAAAAPAAYAAAAAAAEAAAAQAAYAAAAAAAEAAAARAAYAAAAAAAEAAAA=")
 tile_set = SubResource("TileSet_bdfyo")
 
 [node name="exit_right" type="Area2D" parent="."]
-metadata/target_room = "res://rooms/room5.tscn"
+metadata/target_room = "res://rooms/room8.tscn"
 metadata/spawn_point = "spawn_left"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="exit_right"]
@@ -337,7 +337,7 @@ shape = SubResource("RectangleShape2D_n2rm1")
 
 [node name="exit_left" type="Area2D" parent="."]
 position = Vector2(8, 237)
-metadata/target_room = "res://rooms/room3.tscn"
+metadata/target_room = "res://rooms/room6.tscn"
 metadata/spawn_point = "spawn_right"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="exit_left"]
@@ -355,7 +355,7 @@ metadata/size = Vector2(0, 0)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(0, 1)
-script = ExtResource("3_kn1s0")
+script = ExtResource("3_syauk")
 bounds_node_path = NodePath("../ReferenceRect")
 
 [node name="ReferenceRect" type="ReferenceRect" parent="."]
@@ -364,71 +364,65 @@ offset_bottom = 271.0
 
 [node name="spikes" type="Node" parent="."]
 
-[node name="Spike" parent="spikes" instance=ExtResource("4_25806")]
+[node name="Spike" parent="spikes" instance=ExtResource("4_osuhy")]
 position = Vector2(104, 248)
 
-[node name="Spike2" parent="spikes" instance=ExtResource("4_25806")]
+[node name="Spike14" parent="spikes" instance=ExtResource("4_osuhy")]
+position = Vector2(88, 248)
+
+[node name="Spike2" parent="spikes" instance=ExtResource("4_osuhy")]
 position = Vector2(120, 248)
 
-[node name="Spike3" parent="spikes" instance=ExtResource("4_25806")]
+[node name="Spike3" parent="spikes" instance=ExtResource("4_osuhy")]
 position = Vector2(136, 248)
 
-[node name="Spike4" parent="spikes" instance=ExtResource("4_25806")]
+[node name="Spike4" parent="spikes" instance=ExtResource("4_osuhy")]
 position = Vector2(152, 248)
 
-[node name="Spike5" parent="spikes" instance=ExtResource("4_25806")]
+[node name="Spike5" parent="spikes" instance=ExtResource("4_osuhy")]
 position = Vector2(168, 248)
 
-[node name="Spike6" parent="spikes" instance=ExtResource("4_25806")]
+[node name="Spike6" parent="spikes" instance=ExtResource("4_osuhy")]
 position = Vector2(184, 248)
 
-[node name="Spike7" parent="spikes" instance=ExtResource("4_25806")]
+[node name="Spike7" parent="spikes" instance=ExtResource("4_osuhy")]
 position = Vector2(200, 248)
 
-[node name="Spike8" parent="spikes" instance=ExtResource("4_25806")]
+[node name="Spike8" parent="spikes" instance=ExtResource("4_osuhy")]
 position = Vector2(216, 248)
 
-[node name="Spike9" parent="spikes" instance=ExtResource("4_25806")]
+[node name="Spike9" parent="spikes" instance=ExtResource("4_osuhy")]
 position = Vector2(232, 248)
 
-[node name="Spike10" parent="spikes" instance=ExtResource("4_25806")]
+[node name="Spike10" parent="spikes" instance=ExtResource("4_osuhy")]
 position = Vector2(248, 248)
 
-[node name="Spike11" parent="spikes" instance=ExtResource("4_25806")]
+[node name="Spike11" parent="spikes" instance=ExtResource("4_osuhy")]
 position = Vector2(264, 248)
 
-[node name="Spike12" parent="spikes" instance=ExtResource("4_25806")]
+[node name="Spike12" parent="spikes" instance=ExtResource("4_osuhy")]
 position = Vector2(280, 248)
 
-[node name="Spike13" parent="spikes" instance=ExtResource("4_25806")]
+[node name="Spike13" parent="spikes" instance=ExtResource("4_osuhy")]
 position = Vector2(296, 248)
 
 [node name="platforms" type="Node" parent="."]
 
-[node name="Platform" parent="platforms" instance=ExtResource("4_rwobn")]
-position = Vector2(70, 239)
+[node name="Platform" parent="platforms" instance=ExtResource("5_1434n")]
+position = Vector2(64, 212)
+direction = Vector2(0, -1)
+distance = 150.0
+speed = 50.0
 
-[node name="Platform2" parent="platforms" instance=ExtResource("4_rwobn")]
-position = Vector2(106, 219)
+[node name="Platform2" parent="platforms" instance=ExtResource("5_1434n")]
+position = Vector2(192, 120)
+direction = Vector2(0, -1)
+distance = 50.0
+speed = 50.0
 charge = -1
 
-[node name="Platform3" parent="platforms" instance=ExtResource("4_rwobn")]
-position = Vector2(70, 194)
-
-[node name="Platform4" parent="platforms" instance=ExtResource("4_rwobn")]
-position = Vector2(133, 178)
-charge = -1
-
-[node name="Platform5" parent="platforms" instance=ExtResource("4_rwobn")]
-position = Vector2(188, 178)
-
-[node name="Platform6" parent="platforms" instance=ExtResource("4_rwobn")]
-position = Vector2(241, 199)
-charge = -1
-
-[node name="Platform7" parent="platforms" instance=ExtResource("4_rwobn")]
-position = Vector2(276, 174)
-
-[node name="Platform8" parent="platforms" instance=ExtResource("4_rwobn")]
-position = Vector2(311, 204)
-charge = -1
+[node name="Platform3" parent="platforms" instance=ExtResource("5_1434n")]
+position = Vector2(320, 168)
+direction = Vector2(0, 1)
+distance = 50.0
+speed = 50.0

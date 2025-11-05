@@ -83,6 +83,7 @@ func load_room(packed: PackedScene, spawn_point_name: String = "Spawn") -> void:
 		player.global_position = spawn.global_position
 	else:
 		push_warning("No spawn point '%s' in %s" % [spawn_point_name, packed.resource_path])
+	player.reset_charge()
 	
 	connect_exits(current_room)
 

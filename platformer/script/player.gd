@@ -18,6 +18,7 @@ extends CharacterBody2D
 @export var wall_jump_input_lock := 0.12  # Reduced input lock
 @export var max_fall_speed := 500.0
 @export var horizontal_momentum := 0.5
+@export var death_animation_duration := 0.8
 
 var coyote_timer := 0.0
 var jump_buffer_timer := 0.0
@@ -33,6 +34,8 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity") * 0.85
 var charge := 0
 var is_launched := false
 var launch_timer := 0.0
+var is_dead := false
+var input_disabled := false
 
 @onready var animated_sprite = $AnimatedSprite2D
 @onready var ray_cast_left = $WallRayCastLeft
@@ -52,6 +55,10 @@ func _ready():
 	add_to_group("player")
 
 func _physics_process(delta: float):
+	if is_dead or input_disabled:
+		apply_gravity(delta)
+		move_and_slide()
+		return
 	#update_oxygen_label()
 	lock_wall_jump(delta)
 	check_wall_collision()
@@ -194,6 +201,8 @@ func apply_horizontal_movement(delta: float):
 	velocity.x = move_toward(velocity.x, target_speed, rate * delta)
 
 func update_animation():
+	if is_dead:
+		return
 	if charge == 0:
 		if abs(velocity.x) < 5:
 			animated_sprite.play("static_idle")
@@ -269,3 +278,41 @@ func set_launched(duration: float) -> void:
 	jump_buffer_timer = 0
 	wall_jump_lockout = wall_jump_lockout_duration
 	wall_jump_control_lock = 0
+	
+func reset_charge():
+	if charge != 0:
+		charge = 0
+		charge_changed.emit(charge)
+		
+func disable_input():
+	input_disabled = true
+	
+func enable_input():
+	input_disabled = false
+	
+func is_input_disabled() -> bool:
+	return input_disabled
+func die() -> void:
+	if is_dead:
+		return
+	is_dead = true
+	disable_input()
+
+	# Play death animation (non-looping)
+	animated_sprite.play("static_die")
+	animated_sprite.animation_finished.connect(_on_death_animation_finished, CONNECT_ONE_SHOT)
+
+	# Optional: stop horizontal movement instantly
+	velocity.x = 0
+
+	# Wait for animation (or forced duration) before restarting
+	await get_tree().create_timer(death_animation_duration).timeout
+	# (the signal will handle the restart – see below)
+	
+func _on_death_animation_finished() -> void:
+	# Find RoomManager and restart
+	var room_manager = get_tree().root.find_child("RoomManager", true, false)
+	if room_manager and room_manager.has_method("restart_current_room"):
+		room_manager.restart_current_room()
+	else:
+		push_error("RoomManager not found!")

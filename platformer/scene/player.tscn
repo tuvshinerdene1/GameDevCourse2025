@@ -482,9 +482,9 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_n3008")
 }],
-"loop": true,
+"loop": false,
 "name": &"static_die",
-"speed": 5.0
+"speed": 10.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -579,7 +579,7 @@ wall_jump_horizontal = 150.0
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(0, -12)
 sprite_frames = SubResource("SpriteFrames_oh5ij")
-animation = &"negative_run"
+animation = &"static_die"
 autoplay = "static_idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
