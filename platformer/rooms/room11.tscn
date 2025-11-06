@@ -1,10 +1,13 @@
-[gd_scene load_steps=12 format=4 uid="uid://dyvti6s6pah5c"]
+[gd_scene load_steps=15 format=4 uid="uid://dyvti6s6pah5c"]
 
 [ext_resource type="Texture2D" uid="uid://mj61rviyscfb" path="res://asset/sprites/world_tileset.png" id="1_hobiq"]
 [ext_resource type="Texture2D" uid="uid://mfkespubtear" path="res://asset/sprites/spike.png" id="2_xub66"]
 [ext_resource type="Script" uid="uid://dwa5p7xnllqy1" path="res://script/camera_2d.gd" id="3_7xg02"]
 [ext_resource type="PackedScene" uid="uid://0cmo0fvhxbmn" path="res://scene/spike.tscn" id="4_nnoqi"]
+[ext_resource type="PackedScene" uid="uid://wrevci1pd52y" path="res://scene/platform_static.tscn" id="5_7xg02"]
 [ext_resource type="PackedScene" uid="uid://dillaf3rjljlp" path="res://scene/platform.tscn" id="5_jsgea"]
+[ext_resource type="PackedScene" uid="uid://dn2yjbgwtqk5u" path="res://scene/orb.tscn" id="7_nnoqi"]
+[ext_resource type="PackedScene" uid="uid://2yah7uafyxya" path="res://scene/coin.tscn" id="8_nnoqi"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mvttx"]
 texture = ExtResource("1_hobiq")
@@ -324,11 +327,11 @@ size = Vector2(6, 36)
 tile_set = SubResource("TileSet_5woho")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="."]
-tile_map_data = PackedByteArray("AAABABAAAAAAAAAAAAACABAAAAAAAAAAAAAEABAAAAAAAAAAAAADABAAAAAAAAAAAAAFABAAAAAAAAAAAAAGABAAAAAAAAAAAAAHABAAAAAAAAAAAAAIABAAAAAAAAAAAAAJABAAAAAAAAAAAAAKABAAAAAAAAAAAAALABAAAAAAAAAAAAAMABAAAAAAAAAAAAANABAAAAAAAAAAAAAOABAAAAAAAAAAAAAPABAAAAAAAAAAAAAQABAAAAAAAAAAAAARABAAAAAAAAAAAAASABAAAAAAAAAAAAATABAAAAAAAAAAAAAUABAAAAAAAAAAAAAVABAAAAAAAAAAAAAWABAAAAAAAAAAAAABAAAAAAAAAAAAADACAAAAAAAAAAAAADADAAAAAAAAAAAAADAEAAAAAAAAAAAAADAFAAAAAAAAAAAAADAGAAAAAAAAAAAAADAHAAAAAAAAAAAAADAIAAAAAAAAAAAAADAJAAAAAAAAAAAAADAKAAAAAAAAAAAAADALAAAAAAAAAAAAADAMAAAAAAAAAAAAADANAAAAAAAAAAAAADAOAAAAAAAAAAAAADAPAAAAAAAAAAAAADAQAAAAAAAAAAAAADARAAAAAAAAAAAAADASAAAAAAAAAAAAADATAAAAAAAAAAAAADAUAAAAAAAAAAAAADAVAAAAAAAAAAAAADAWAAAAAAAAAAAAADAXAAEAAAAAAAAAAGAXAAIAAAAAAAAAAGAXAAMAAAAAAAAAAGAXAAQAAAAAAAAAAGAXAAUAAAAAAAAAAGAXAAYAAAAAAAAAAGAXAAcAAAAAAAAAAGAXAAgAAAAAAAAAAGAXAAkAAAAAAAAAAGAXAAoAAAAAAAAAAGAXAAsAAAAAAAAAAGAXAAwAAAAAAAAAAGAXAA0AAAAAAAAAAGAAAAEAAAAAAAAAAFAAAAIAAAAAAAAAAFAAAAMAAAAAAAAAAFAAAAQAAAAAAAAAAFAAAAUAAAAAAAAAAFAAAAYAAAAAAAAAAFAAAAcAAAAAAAAAAFAAAAgAAAAAAAAAAFAAAAkAAAAAAAAAAFAAAAoAAAAAAAAAAFAAAAsAAAAAAAAAAFAAAAwAAAAAAAAAAFAAAA0AAAAAAAAAAFAAABAAAAABAAAAAFAXABAAAAABAAAAAAAXAAAAAAABAAAAAGAAAAAAAAABAAAAADAYABAAAAAAAAAAAAAZABAAAAAAAAAAAAAaABAAAAAAAAAAAAAbABAAAAAAAAAAAAD//xAAAAAAAAAAAAD+/xAAAAAAAAAAAAD9/xAAAAAAAAAAAAD8/xAAAAAAAAAAAAD7/xAAAAAAAAAAAAADAA8AAAAAAAEAAAAEAA8AAAAAAAEAAAAEAA4AAAAAAAEAAAATAA4AAAAAAAEAAAATAA8AAAAAAAEAAAAUAA8AAAAAAAEAAAAFAAgAAAAAAAEAAAAGAAgAAAAAAAEAAAAHAAgAAAAAAAEAAAAIAAgAAAAAAAEAAAAPAAYAAAAAAAEAAAAQAAYAAAAAAAEAAAARAAYAAAAAAAEAAAA=")
+tile_map_data = PackedByteArray("AAABABAAAAAAAAAAAAACABAAAAAAAAAAAAAEABAAAAAAAAAAAAADABAAAAAAAAAAAAAFABAAAAAAAAAAAAAGABAAAAAAAAAAAAAHABAAAAAAAAAAAAAIABAAAAAAAAAAAAAJABAAAAAAAAAAAAAKABAAAAAAAAAAAAALABAAAAAAAAAAAAAMABAAAAAAAAAAAAANABAAAAAAAAAAAAAOABAAAAAAAAAAAAAPABAAAAAAAAAAAAAQABAAAAAAAAAAAAARABAAAAAAAAAAAAASABAAAAAAAAAAAAATABAAAAAAAAAAAAAUABAAAAAAAAAAAAAVABAAAAAAAAAAAAAWABAAAAAAAAAAAAABAAAAAAAAAAAAADACAAAAAAAAAAAAADADAAAAAAAAAAAAADAEAAAAAAAAAAAAADAFAAAAAAAAAAAAADAGAAAAAAAAAAAAADAHAAAAAAAAAAAAADAIAAAAAAAAAAAAADAJAAAAAAAAAAAAADAKAAAAAAAAAAAAADALAAAAAAAAAAAAADAMAAAAAAAAAAAAADANAAAAAAAAAAAAADAOAAAAAAAAAAAAADAPAAAAAAAAAAAAADAQAAAAAAAAAAAAADARAAAAAAAAAAAAADASAAAAAAAAAAAAADATAAAAAAAAAAAAADAUAAAAAAAAAAAAADAVAAAAAAAAAAAAADAWAAAAAAAAAAAAADAXAAEAAAAAAAAAAGAXAAIAAAAAAAAAAGAXAAMAAAAAAAAAAGAXAAQAAAAAAAAAAGAXAAUAAAAAAAAAAGAXAAYAAAAAAAAAAGAXAAcAAAAAAAAAAGAXAAgAAAAAAAAAAGAXAAkAAAAAAAAAAGAXAAoAAAAAAAAAAGAXAAsAAAAAAAAAAGAXAAwAAAAAAAAAAGAXAA0AAAAAAAAAAGAAAAEAAAAAAAAAAFAAAAIAAAAAAAAAAFAAAAMAAAAAAAAAAFAAAAQAAAAAAAAAAFAAAAUAAAAAAAAAAFAAAAYAAAAAAAAAAFAAAAcAAAAAAAAAAFAAAAgAAAAAAAAAAFAAAAkAAAAAAAAAAFAAAAoAAAAAAAAAAFAAAAsAAAAAAAAAAFAAAAwAAAAAAAAAAFAAAA0AAAAAAAAAAFAAABAAAAABAAAAAFAXABAAAAABAAAAAAAXAAAAAAABAAAAAGAAAAAAAAABAAAAADAYABAAAAAAAAAAAAAZABAAAAAAAAAAAAAaABAAAAAAAAAAAAAbABAAAAAAAAAAAAD//xAAAAAAAAAAAAD+/xAAAAAAAAAAAAD9/xAAAAAAAAAAAAD8/xAAAAAAAAAAAAD7/xAAAAAAAAAAAAAKAAEAAAAAAAEAAAAKAAIAAAAAAAEAAAAKAAMAAAAAAAEAAAAKAAQAAAAAAAEAAAAKAAUAAAAAAAEAAAAKAAYAAAAAAAEAAAAKAAcAAAAAAAEAAAAKAAgAAAAAAAEAAAALAAgAAAAAAAEAAAALAAcAAAAAAAEAAAALAAYAAAAAAAEAAAALAAUAAAAAAAEAAAALAAQAAAAAAAEAAAALAAMAAAAAAAEAAAALAAIAAAAAAAEAAAALAAEAAAAAAAEAAAAEAA8AAAAAAAEAAAAEAA4AAAAAAAEAAAAEAA0AAAAAAAEAAAAEAAwAAAAAAAEAAAAEAAsAAAAAAAEAAAAEAAoAAAAAAAEAAAAEAAkAAAAAAAEAAAAFAAkAAAAAAAEAAAAFAAoAAAAAAAEAAAAFAAsAAAAAAAEAAAAFAAwAAAAAAAEAAAAFAA0AAAAAAAEAAAAFAA4AAAAAAAEAAAAFAA8AAAAAAAEAAAAJAA8AAAAAAAEAAAAJAA4AAAAAAAEAAAAJAA0AAAAAAAEAAAANAA0AAAAAAAEAAAANAA4AAAAAAAEAAAANAA8AAAAAAAEAAAAMAA8AAAAAAAEAAAALAA8AAAAAAAEAAAAKAA8AAAAAAAEAAAAKAA4AAAAAAAEAAAALAA4AAAAAAAEAAAAMAA4AAAAAAAEAAAAMAA0AAAAAAAEAAAALAA0AAAAAAAEAAAAKAA0AAAAAAAEAAAAUAAQAAAAAAAEAAAAVAAQAAAAAAAEAAAATAAQAAAAAAAEAAAARAA4AAAAAAAEAAAASAA4AAAAAAAEAAAATAA4AAAAAAAEAAAAUAA4AAAAAAAEAAAAQAAQAAAAAAAEAAAARAAQAAAAAAAEAAAASAAQAAAAAAAEAAAA=")
 tile_set = SubResource("TileSet_bdfyo")
 
 [node name="exit_right" type="Area2D" parent="."]
-metadata/target_room = "res://rooms/room7.tscn"
+metadata/target_room = "res://rooms/room12.tscn"
 metadata/spawn_point = "spawn_left"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="exit_right"]
@@ -337,7 +340,7 @@ shape = SubResource("RectangleShape2D_n2rm1")
 
 [node name="exit_left" type="Area2D" parent="."]
 position = Vector2(8, 237)
-metadata/target_room = "res://rooms/room6.tscn"
+metadata/target_room = "res://rooms/room10.tscn"
 metadata/spawn_point = "spawn_right"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="exit_left"]
@@ -365,64 +368,95 @@ offset_bottom = 271.0
 [node name="spikes" type="Node" parent="."]
 
 [node name="Spike" parent="spikes" instance=ExtResource("4_nnoqi")]
-position = Vector2(104, 248)
-
-[node name="Spike14" parent="spikes" instance=ExtResource("4_nnoqi")]
-position = Vector2(88, 248)
+position = Vector2(72, 136)
 
 [node name="Spike2" parent="spikes" instance=ExtResource("4_nnoqi")]
-position = Vector2(120, 248)
+position = Vector2(88, 136)
 
 [node name="Spike3" parent="spikes" instance=ExtResource("4_nnoqi")]
-position = Vector2(136, 248)
+position = Vector2(104, 248)
 
 [node name="Spike4" parent="spikes" instance=ExtResource("4_nnoqi")]
-position = Vector2(152, 248)
+position = Vector2(120, 248)
 
 [node name="Spike5" parent="spikes" instance=ExtResource("4_nnoqi")]
-position = Vector2(168, 248)
+position = Vector2(136, 248)
+
+[node name="Spike14" parent="spikes" instance=ExtResource("4_nnoqi")]
+position = Vector2(152, 200)
+
+[node name="Spike15" parent="spikes" instance=ExtResource("4_nnoqi")]
+position = Vector2(168, 200)
+
+[node name="Spike16" parent="spikes" instance=ExtResource("4_nnoqi")]
+position = Vector2(184, 200)
+
+[node name="Spike17" parent="spikes" instance=ExtResource("4_nnoqi")]
+position = Vector2(200, 200)
+
+[node name="Spike18" parent="spikes" instance=ExtResource("4_nnoqi")]
+position = Vector2(216, 200)
 
 [node name="Spike6" parent="spikes" instance=ExtResource("4_nnoqi")]
-position = Vector2(184, 248)
-
-[node name="Spike7" parent="spikes" instance=ExtResource("4_nnoqi")]
-position = Vector2(200, 248)
-
-[node name="Spike8" parent="spikes" instance=ExtResource("4_nnoqi")]
-position = Vector2(216, 248)
-
-[node name="Spike9" parent="spikes" instance=ExtResource("4_nnoqi")]
 position = Vector2(232, 248)
 
-[node name="Spike10" parent="spikes" instance=ExtResource("4_nnoqi")]
+[node name="Spike7" parent="spikes" instance=ExtResource("4_nnoqi")]
 position = Vector2(248, 248)
 
-[node name="Spike11" parent="spikes" instance=ExtResource("4_nnoqi")]
+[node name="Spike8" parent="spikes" instance=ExtResource("4_nnoqi")]
 position = Vector2(264, 248)
 
-[node name="Spike12" parent="spikes" instance=ExtResource("4_nnoqi")]
+[node name="Spike9" parent="spikes" instance=ExtResource("4_nnoqi")]
 position = Vector2(280, 248)
 
-[node name="Spike13" parent="spikes" instance=ExtResource("4_nnoqi")]
+[node name="Spike10" parent="spikes" instance=ExtResource("4_nnoqi")]
 position = Vector2(296, 248)
+
+[node name="Spike11" parent="spikes" instance=ExtResource("4_nnoqi")]
+position = Vector2(312, 248)
+
+[node name="Spike12" parent="spikes" instance=ExtResource("4_nnoqi")]
+position = Vector2(328, 248)
+
+[node name="Spike13" parent="spikes" instance=ExtResource("4_nnoqi")]
+position = Vector2(328, 248)
 
 [node name="platforms" type="Node" parent="."]
 
-[node name="Platform" parent="platforms" instance=ExtResource("5_jsgea")]
-position = Vector2(64, 212)
-direction = Vector2(0, -1)
-distance = 150.0
-speed = 50.0
+[node name="Platform" parent="platforms" instance=ExtResource("5_7xg02")]
+position = Vector2(48, 232)
 
-[node name="Platform2" parent="platforms" instance=ExtResource("5_jsgea")]
-position = Vector2(192, 120)
-direction = Vector2(0, -1)
-distance = 50.0
-speed = 50.0
+[node name="Platform2" parent="platforms" instance=ExtResource("5_7xg02")]
+position = Vector2(48, 208)
 charge = -1
 
-[node name="Platform3" parent="platforms" instance=ExtResource("5_jsgea")]
-position = Vector2(320, 56)
-direction = Vector2(0, 1)
-distance = 50.0
+[node name="Platform3" parent="platforms" instance=ExtResource("5_7xg02")]
+position = Vector2(48, 184)
+
+[node name="Platform6" parent="platforms" instance=ExtResource("5_7xg02")]
+position = Vector2(48, 160)
+charge = -1
+
+[node name="Platform4" parent="platforms" instance=ExtResource("5_7xg02")]
+position = Vector2(112, 192)
+
+[node name="Platform5" parent="platforms" instance=ExtResource("5_jsgea")]
+position = Vector2(224, 138)
+direction = Vector2(0, -1)
+distance = 70.0
 speed = 50.0
+
+[node name="orbs" type="Node" parent="."]
+
+[node name="Orb" parent="orbs" instance=ExtResource("7_nnoqi")]
+position = Vector2(48, 120)
+
+[node name="Orb2" parent="orbs" instance=ExtResource("7_nnoqi")]
+position = Vector2(160, 168)
+
+[node name="Orb3" parent="orbs" instance=ExtResource("7_nnoqi")]
+position = Vector2(224, 168)
+charge = -1
+
+[node name="Coin" parent="." instance=ExtResource("8_nnoqi")]
+position = Vector2(272, 48)

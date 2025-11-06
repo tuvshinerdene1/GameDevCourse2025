@@ -1,10 +1,11 @@
-[gd_scene load_steps=12 format=4 uid="uid://bvmjyla36k5a5"]
+[gd_scene load_steps=13 format=4 uid="uid://bvmjyla36k5a5"]
 
 [ext_resource type="Texture2D" uid="uid://mj61rviyscfb" path="res://asset/sprites/world_tileset.png" id="1_q0i8w"]
 [ext_resource type="Texture2D" uid="uid://mfkespubtear" path="res://asset/sprites/spike.png" id="2_wftco"]
 [ext_resource type="Script" uid="uid://dwa5p7xnllqy1" path="res://script/camera_2d.gd" id="3_syauk"]
 [ext_resource type="PackedScene" uid="uid://0cmo0fvhxbmn" path="res://scene/spike.tscn" id="4_osuhy"]
 [ext_resource type="PackedScene" uid="uid://dillaf3rjljlp" path="res://scene/platform.tscn" id="5_1434n"]
+[ext_resource type="PackedScene" uid="uid://2yah7uafyxya" path="res://scene/coin.tscn" id="6_wftco"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mvttx"]
 texture = ExtResource("1_q0i8w")
@@ -426,3 +427,6 @@ position = Vector2(320, 168)
 direction = Vector2(0, 1)
 distance = 50.0
 speed = 50.0
+
+[node name="Coin" parent="." instance=ExtResource("6_wftco")]
+position = Vector2(264, 88)

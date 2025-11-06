@@ -1,5 +1,12 @@
 # Game.gd  (attached to the root node of your game, e.g. Node2D named "Game")
 extends Node2D
+@export var scorelabel : PackedScene
+var points = 0
+
+func add_point():
+	points += 1
+	scorelabel.text = "coins: "+str(points)
+	
 
 func _ready():
 	# Set fullscreen mode

@@ -3,7 +3,7 @@ extends Node
 @export var start_room: PackedScene
 @export var player_scene: PackedScene
 @export var transition_duration: float = 0.3  # Transition speed in seconds
-
+@export var main_menu : PackedScene
 var current_room: Node = null
 var player: Node = null
 var is_transitioning: bool = false
@@ -118,8 +118,12 @@ func _on_exit_entered(body: Node, exit_area: Area2D) -> void:
 	
 	var target_room: String = exit_area.get_meta("target_room") as String
 	var spawn_point: String = exit_area.get_meta("spawn_point", "Spawn") as String
-	call_deferred("change_room", target_room, spawn_point)
-
+	
+	# NEW: Check if this exit goes to main menu
+	if target_room == "MAIN_MENU":  # Special keyword
+		call_deferred("go_to_main_menu")
+	else:
+		call_deferred("change_room", target_room, spawn_point)
 func get_current_room() -> Node:
 	return current_room
 
@@ -141,3 +145,18 @@ func fade_in() -> void:
 	var tween = create_tween()
 	tween.tween_property(transition_overlay, "position:x", viewport_width, transition_duration).set_ease(Tween.EASE_IN_OUT)
 	await tween.finished
+	
+func go_to_main_menu() -> void:
+	if is_transitioning:
+		return
+	is_transitioning = true
+	await fade_out()
+	
+	# Clean up current room/player (optional but clean)
+	if current_room:
+		current_room.queue_free()
+	if player:
+		player.queue_free()
+	
+	# Switch to main menu
+	get_tree().change_scene_to_packed(main_menu)

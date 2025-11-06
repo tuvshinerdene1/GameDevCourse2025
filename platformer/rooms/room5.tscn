@@ -1,10 +1,11 @@
-[gd_scene load_steps=12 format=4 uid="uid://bvjvhh8825ain"]
+[gd_scene load_steps=13 format=4 uid="uid://bvjvhh8825ain"]
 
 [ext_resource type="Texture2D" uid="uid://mj61rviyscfb" path="res://asset/sprites/world_tileset.png" id="1_w18et"]
 [ext_resource type="Texture2D" uid="uid://mfkespubtear" path="res://asset/sprites/spike.png" id="2_geci1"]
 [ext_resource type="Script" uid="uid://dwa5p7xnllqy1" path="res://script/camera_2d.gd" id="3_kqd4i"]
 [ext_resource type="PackedScene" uid="uid://0cmo0fvhxbmn" path="res://scene/spike.tscn" id="4_vh6jf"]
 [ext_resource type="PackedScene" uid="uid://wrevci1pd52y" path="res://scene/platform_static.tscn" id="5_w18et"]
+[ext_resource type="PackedScene" uid="uid://2yah7uafyxya" path="res://scene/coin.tscn" id="6_geci1"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mvttx"]
 texture = ExtResource("1_w18et")
@@ -428,3 +429,6 @@ position = Vector2(216, 157)
 [node name="Platform4" parent="platforms" instance=ExtResource("5_w18et")]
 position = Vector2(256, 191)
 charge = -1
+
+[node name="Coin" parent="." instance=ExtResource("6_geci1")]
+position = Vector2(174, 98)

@@ -1,10 +1,12 @@
-[gd_scene load_steps=12 format=4 uid="uid://ctc0p0f6k7eky"]
+[gd_scene load_steps=14 format=4 uid="uid://ctc0p0f6k7eky"]
 
 [ext_resource type="Texture2D" uid="uid://mj61rviyscfb" path="res://asset/sprites/world_tileset.png" id="1_ckrtx"]
 [ext_resource type="Texture2D" uid="uid://mfkespubtear" path="res://asset/sprites/spike.png" id="2_pwcb5"]
 [ext_resource type="Script" uid="uid://dwa5p7xnllqy1" path="res://script/camera_2d.gd" id="3_rwtk5"]
 [ext_resource type="PackedScene" uid="uid://0cmo0fvhxbmn" path="res://scene/spike.tscn" id="4_bmmps"]
 [ext_resource type="PackedScene" uid="uid://dillaf3rjljlp" path="res://scene/platform.tscn" id="5_ckrtx"]
+[ext_resource type="PackedScene" uid="uid://wrevci1pd52y" path="res://scene/platform_static.tscn" id="6_pwcb5"]
+[ext_resource type="PackedScene" uid="uid://2yah7uafyxya" path="res://scene/coin.tscn" id="7_rwtk5"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mvttx"]
 texture = ExtResource("1_ckrtx")
@@ -410,5 +412,11 @@ position = Vector2(296, 248)
 
 [node name="Platform" parent="platforms" instance=ExtResource("5_ckrtx")]
 position = Vector2(104, 216)
-distance = 150.0
-speed = 50.0
+distance = 160.0
+speed = 55.0
+
+[node name="Platform2" parent="platforms" instance=ExtResource("6_pwcb5")]
+position = Vector2(193, 189)
+
+[node name="Coin" parent="." instance=ExtResource("7_rwtk5")]
+position = Vector2(193, 171)
