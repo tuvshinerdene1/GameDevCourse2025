@@ -1,0 +1,237 @@
+[gd_scene load_steps=24 format=3 uid="uid://77tbuy338s86"]
+
+[ext_resource type="Texture2D" uid="uid://bxwoueensc36o" path="res://assets/Streets of Fight files/Assets/Sprites/Brawler-Girl/Idle/idle1.png" id="1_dqkch"]
+[ext_resource type="Texture2D" uid="uid://ki7kr3tuv1sx" path="res://assets/Streets of Fight files/Assets/Sprites/Brawler-Girl/Idle/idle2.png" id="2_qlg0r"]
+[ext_resource type="Texture2D" uid="uid://c0tsos4wpy2du" path="res://assets/Streets of Fight files/Assets/Sprites/Brawler-Girl/Idle/idle3.png" id="3_tuyoq"]
+[ext_resource type="Texture2D" uid="uid://coctaolvurtc8" path="res://assets/Streets of Fight files/Assets/Sprites/Brawler-Girl/Idle/idle4.png" id="4_fjrip"]
+[ext_resource type="Texture2D" uid="uid://bfhtffamfk271" path="res://assets/Streets of Fight files/Assets/Sprites/Brawler-Girl/Walk/walk1.png" id="5_qfm1y"]
+[ext_resource type="Script" uid="uid://q5pockt0wid6" path="res://scripts/StateMachine/state_machine.gd" id="5_qlg0r"]
+[ext_resource type="Texture2D" uid="uid://c1jw10whchnfk" path="res://assets/Streets of Fight files/Assets/Sprites/Brawler-Girl/Walk/walk2.png" id="6_fulsm"]
+[ext_resource type="Script" uid="uid://cfkjhvgu553ft" path="res://scripts/States/idle_state.gd" id="6_tuyoq"]
+[ext_resource type="Texture2D" uid="uid://cv4h572gp1h4f" path="res://assets/Streets of Fight files/Assets/Sprites/Brawler-Girl/Walk/walk3.png" id="7_4r5pv"]
+[ext_resource type="Script" uid="uid://j54eevdtw3hl" path="res://scripts/States/run_state.gd" id="7_fjrip"]
+[ext_resource type="Texture2D" uid="uid://b5l2odphlisp1" path="res://assets/Streets of Fight files/Assets/Sprites/Brawler-Girl/Walk/walk4.png" id="8_60mlk"]
+[ext_resource type="Texture2D" uid="uid://omax01rqhg24" path="res://assets/Streets of Fight files/Assets/Sprites/Brawler-Girl/Walk/walk5.png" id="9_i4ail"]
+[ext_resource type="Texture2D" uid="uid://jllpafgwbkyo" path="res://assets/Streets of Fight files/Assets/Sprites/Brawler-Girl/Walk/walk6.png" id="10_a38lo"]
+[ext_resource type="Texture2D" uid="uid://rdgaes2we0v6" path="res://assets/Streets of Fight files/Assets/Sprites/Brawler-Girl/Walk/walk7.png" id="11_4ni07"]
+[ext_resource type="Texture2D" uid="uid://bdygg4lexmh80" path="res://assets/Streets of Fight files/Assets/Sprites/Brawler-Girl/Walk/walk8.png" id="12_l71n6"]
+[ext_resource type="Texture2D" uid="uid://yjsgjh7ggfsw" path="res://assets/Streets of Fight files/Assets/Sprites/Brawler-Girl/Walk/walk9.png" id="13_ke2ow"]
+[ext_resource type="Texture2D" uid="uid://cw2mp4pds2pgf" path="res://assets/Streets of Fight files/Assets/Sprites/Brawler-Girl/Walk/walk10.png" id="14_ujl30"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_qhqgy"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_dqkch")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_qlg0r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_tuyoq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_fjrip")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_qfm1y")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_fulsm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_4r5pv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_60mlk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_i4ail")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_a38lo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_4ni07")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_l71n6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_ke2ow")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_ujl30")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 8.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_dqkch"]
+radius = 5.0
+height = 40.0
+
+[sub_resource type="Animation" id="Animation_qfm1y"]
+resource_name = "idle"
+length = 0.5187
+loop_mode = 1
+step = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [&"idle"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.00147765, 0.105431, 0.213817, 0.31777, 0.424678),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 2, 3, 0, 1]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("CollisionShape2D:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-6, 10)]
+}
+
+[sub_resource type="Animation" id="Animation_qhqgy"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [&"idle"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("CollisionShape2D:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-6, 10)]
+}
+
+[sub_resource type="Animation" id="Animation_fulsm"]
+resource_name = "walk"
+length = 2.00002
+loop_mode = 1
+step = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [&"walk"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("CollisionShape2D:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-1, 10)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_fulsm"]
+_data = {
+&"RESET": SubResource("Animation_qhqgy"),
+&"idle": SubResource("Animation_qfm1y"),
+&"walk": SubResource("Animation_fulsm")
+}
+
+[node name="CharacterBody2D" type="CharacterBody2D"]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_qhqgy")
+animation = &"idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-6, 10)
+shape = SubResource("CapsuleShape2D_dqkch")
+
+[node name="StateMachine" type="Node" parent="." node_paths=PackedStringArray("initial_state")]
+script = ExtResource("5_qlg0r")
+initial_state = NodePath("IdleState")
+
+[node name="IdleState" type="Node" parent="StateMachine" node_paths=PackedStringArray("animation_player")]
+script = ExtResource("6_tuyoq")
+animation_player = NodePath("../../AnimationPlayer")
+idle_animation_name = "idle"
+
+[node name="RunState" type="Node" parent="StateMachine" node_paths=PackedStringArray("animation_player")]
+script = ExtResource("7_fjrip")
+animation_player = NodePath("../../AnimationPlayer")
+idle_animation_name = "walk"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_fulsm")
+}
