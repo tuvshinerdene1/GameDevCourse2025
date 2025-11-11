@@ -10,6 +10,9 @@ func Enter():
 		animation_player.play(idle_animation_name)
 	else:
 		push_warning("Idle state: Animation player or idle animation not found")
-		
+func Update(delta:float):
+	var move_dir = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
+	if move_dir != 0:
+		Transitioned.emit(self, "walk_state")
 func Exit():
 	super.Exit()

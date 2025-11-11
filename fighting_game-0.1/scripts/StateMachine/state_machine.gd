@@ -27,7 +27,7 @@ func on_child_transitioned(state, new_state_name) -> void:
 		return
 	var new_state = states.get(new_state_name.to_lower())
 	if not new_state:
-		print("couldn't find state"+new_state)
+		print("couldn't find state")
 	if current_state:
 		current_state.Exit()
 	new_state.Enter()
