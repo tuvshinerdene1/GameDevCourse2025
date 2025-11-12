@@ -17,6 +17,10 @@ func Enter():
 
 func Update(delta: float):
 	var move_dir = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
+	if Input.is_action_just_pressed("roll"):
+		Transitioned.emit(self,"roll")
+	if Input.is_action_just_pressed("attack"):
+		Transitioned.emit(self,"light_attack")
 	if move_dir == 0:
 		Transitioned.emit(self,"idle_state")
 		return
