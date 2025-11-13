@@ -20,5 +20,7 @@ func Update(delta:float):
 		Transitioned.emit(self,"roll")
 	if Input.is_action_just_pressed("attack"):
 		Transitioned.emit(self,"light_attack")
+	if Input.is_action_just_pressed("parry"):
+		Transitioned.emit(self,"down_parry")
 func Exit():
 	super.Exit()
