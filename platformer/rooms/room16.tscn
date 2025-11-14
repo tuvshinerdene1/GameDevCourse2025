@@ -367,4 +367,5 @@ offset_bottom = 271.0
 [node name="platforms" type="Node" parent="."]
 
 [node name="Coin" parent="." instance=ExtResource("4_tm3qm")]
-position = Vector2(184, 200)
+position = Vector2(184.00002, 184.00002)
+scale = Vector2(3.8655014, 2.9311597)

@@ -9,8 +9,12 @@
 position = Vector2(-1, 157)
 
 [node name="CharacterBody2D" parent="." instance=ExtResource("2_0wfyh")]
-position = Vector2(84, 96)
+position = Vector2(85, 150)
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(246, 141)
+position = Vector2(250, 112)
 zoom = Vector2(3, 3)
+
+[node name="CharacterBody2D2" parent="." instance=ExtResource("2_0wfyh")]
+position = Vector2(347, 150)
+player_num = 2

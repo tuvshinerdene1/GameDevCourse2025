@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://foqn26wslajw"
+path="res://.godot/imported/Kodo - O-Daiko - HD (japanese drummers - Taiko - tambours géants Japon)-[AudioTrimmer.com].mp3-2c3cf41a6e3fc1489d63b980afd6fd37.mp3str"
+
+[deps]
+
+source_file="res://assets/music/Kodo - O-Daiko - HD (japanese drummers - Taiko - tambours géants Japon)-[AudioTrimmer.com].mp3"
+dest_files=["res://.godot/imported/Kodo - O-Daiko - HD (japanese drummers - Taiko - tambours géants Japon)-[AudioTrimmer.com].mp3-2c3cf41a6e3fc1489d63b980afd6fd37.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
