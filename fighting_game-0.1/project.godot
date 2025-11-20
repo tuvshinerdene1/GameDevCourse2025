@@ -96,6 +96,11 @@ player_2_roll={
 ]
 }
 
+[layer_names]
+
+2d_physics/layer_1="hitbox"
+2d_physics/layer_2="hurtbox"
+
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0

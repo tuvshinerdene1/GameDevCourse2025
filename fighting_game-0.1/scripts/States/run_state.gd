@@ -6,6 +6,7 @@ class_name WalkState
 @export var sprite: AnimatedSprite2D
 @export var move_speed: float = 200.0
 @export var hitbox : Area2D
+@export var parrybox: Area2D
 @onready var character: CharacterBody2D = get_parent().get_parent()
 @onready var player_num = get_parent().get_parent().get_player_num()
 func Enter():
@@ -25,6 +26,8 @@ func Update(delta: float):
 		Transitioned.emit(self,"up_idle_state")
 	if Input.is_action_just_pressed("player_"+str(player_num)+"_stance_down"):
 		Transitioned.emit(self,"idle_state")
+	if Input.is_action_just_pressed("player_"+str(player_num)+"_parry"):
+		Transitioned.emit(self, "down_parry")
 	if move_dir == 0:
 		Transitioned.emit(self,"idle_state")
 		return
@@ -32,6 +35,7 @@ func Update(delta: float):
 	character.move_and_slide()
 	sprite.flip_h = move_dir < 0
 	hitbox.scale.x = 1.0 if not sprite.flip_h else -1.0
+	parrybox.scale.x = 1.0 if not sprite.flip_h else -1.0
 	#if sign(move_dir) == sign(character.velocity.x):
 		#hitbox.scale.x *= -1
 
